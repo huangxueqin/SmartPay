@@ -11,7 +11,7 @@ import com.android.smartpay.jsonbeans.TokenResponse;
 public class Application extends android.app.Application {
     public static final boolean NO_NETWORK_DEBUG = false;
     public static final boolean TEST_DEBUG = false;
-    public static final boolean NORMAL_DEBUG = false;
+    public static final boolean NORMAL_DEBUG = true;
     HttpService httpService;
     DataLoader loader;
     @Override
