@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.android.smartpay">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:name=".Application"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/MyAppTheme">
+        <activity android:name=".MainActivity"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".OrderSpecificActivity" />
+        <activity android:name=".TransactionResultActivity" />
+        <activity android:name=".CaptureActivity" />
+        <activity android:name=".OrderListActivity" />
+        <activity android:name=".StatisticActivity" />
+
+        <activity android:name=".BusinessRuleActivity" />
+        <activity android:name=".UsingHelpActivity" />
+        <activity android:name=".ContactActivity" />
+    </application>
+
+</manifest>

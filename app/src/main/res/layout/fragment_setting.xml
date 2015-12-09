@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingTop="?attr/actionBarSize"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/setting_content_padding_top"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@android:color/darker_gray" />
+        <RelativeLayout
+            android:id="@+id/item_using_help"
+            android:paddingLeft="@dimen/setting_item_padding_horizontal"
+            android:paddingRight="@dimen/setting_item_padding_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/setting_item_height"
+            android:background="@drawable/list_item_sel">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/setting_item_text"
+                android:text="@string/setting_item_use_help"
+                android:layout_centerVertical="true"
+                android:focusable="false"/>
+            <ImageView
+                android:layout_width="@dimen/setting_item_icon_size"
+                android:layout_height="@dimen/setting_item_icon_size"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/forward"
+                android:focusable="false"/>
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@android:color/darker_gray" />
+        <RelativeLayout
+            android:id="@+id/item_business_rule"
+            android:paddingLeft="@dimen/setting_item_padding_horizontal"
+            android:paddingRight="@dimen/setting_item_padding_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/setting_item_height"
+            android:background="@drawable/list_item_sel">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/setting_item_text"
+                android:text="@string/setting_item_business_rule"
+                android:layout_centerVertical="true"
+                android:focusable="false"/>
+            <ImageView
+                android:layout_width="@dimen/setting_item_icon_size"
+                android:layout_height="@dimen/setting_item_icon_size"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/forward"
+                android:focusable="false"/>
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@android:color/darker_gray" />
+        <RelativeLayout
+            android:id="@+id/item_contact"
+            android:paddingLeft="@dimen/setting_item_padding_horizontal"
+            android:paddingRight="@dimen/setting_item_padding_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/setting_item_height"
+            android:background="@drawable/list_item_sel">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/setting_item_text"
+                android:text="@string/setting_item_contact"
+                android:layout_centerVertical="true"
+                android:focusable="false"/>
+            <ImageView
+                android:layout_width="@dimen/setting_item_icon_size"
+                android:layout_height="@dimen/setting_item_icon_size"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/forward"
+                android:focusable="false"/>
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@android:color/darker_gray" />
+    </LinearLayout>
+
+</LinearLayout>

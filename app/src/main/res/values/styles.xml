@@ -1,0 +1,67 @@
+<resources>
+
+    <declare-styleable name="CalculatorDisplay">
+        <attr name="max_text_size" format="integer" />
+        <attr name="min_text_size" format="integer" />
+    </declare-styleable>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="MainTab">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="button_normal_style">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">@color/input_pad_button_text</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:background">@drawable/input_pad_button</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="Transparent">
+        <item name="android:windowBackground">@color/transparent_background</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
+    </style>
+
+    <style name="loginEditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:drawablePadding">@dimen/login_input_drawable_padding</item>
+        <item name="android:padding">@dimen/login_input_padding</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">@dimen/login_input_text</item>
+    </style>
+
+    <style name="App.Spinner.Divider" parent="Widget.AppCompat.Light.ListView.DropDown">
+        <item name="android:dividerHeight">1px</item>
+        <item name="android:divider">@color/colorGray</item>
+    </style>
+
+    <style name="MySpinner" parent="Widget.AppCompat.Light.DropDownItem.Spinner">
+        <item name="android:background">@drawable/spinner_bg</item>
+        <item name="android:popupBackground">@drawable/list_item_sel</item>
+        <item name="android:dropDownSelector">?attr/selectableItemBackground</item>
+        <item name="android:spinnerMode">dropdown</item>
+        <item name="android:layout_marginLeft">15dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_width">@dimen/ola_spinner_width</item>
+        <item name="android:layout_height">@dimen/ola_spinner_height</item>
+    </style>
+</resources>

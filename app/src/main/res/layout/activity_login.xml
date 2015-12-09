@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ScrollView
+        android:fillViewport="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:id="@+id/input"
+                android:orientation="vertical"
+                android:background="@drawable/login_input_pad"
+                android:layout_marginLeft="@dimen/login_margin_horizontal"
+                android:layout_marginRight="@dimen/login_margin_horizontal"
+                android:layout_centerVertical="true"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/login_input_height">
+
+                <EditText
+                    android:id="@+id/username"
+                    android:hint="@string/login_hint_username"
+                    android:drawableLeft="@drawable/login_user"
+                    style="@style/loginEditText" />
+
+                <View
+                    android:background="@android:color/darker_gray"
+                    android:layout_marginLeft="@dimen/login_input_padding"
+                    android:layout_marginRight="@dimen/login_input_padding"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp" />
+
+                <EditText
+                    android:id="@+id/password"
+                    android:hint="@string/login_hint_password"
+                    android:drawableLeft="@drawable/login_password"
+                    android:inputType="textPassword"
+                    style="@style/loginEditText" />
+
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/cb_account_remember"
+                android:layout_below="@id/input"
+                android:layout_alignLeft="@id/input"
+                android:layout_marginTop="@dimen/login_cb_margin_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/login_cb_text"
+                android:text="@string/login_cb"/>
+
+            <Button
+                android:id="@+id/bt_login"
+                android:layout_below="@id/cb_account_remember"
+                android:layout_marginTop="@dimen/login_button_margin_top"
+                android:layout_marginLeft="@dimen/login_margin_horizontal"
+                android:layout_marginRight="@dimen/login_margin_horizontal"
+                android:background="@drawable/button_blue"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/login_button_height"
+                android:textSize="@dimen/login_button_text"
+                android:text="@string/login_button"
+                android:textColor="@color/colorWhite"/>
+        </RelativeLayout>
+    </ScrollView>
+</LinearLayout>

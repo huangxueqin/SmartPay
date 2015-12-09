@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape>
+            <stroke
+                android:width="0.5px"
+                android:color="@color/input_pad_button_stroke" />
+            <solid
+                android:color="@color/input_pad_button_pressed" />
+        </shape>
+    </item>
+
+    <item>
+        <shape>
+            <stroke
+                android:width="0.5px"
+                android:color="@color/input_pad_button_stroke" />
+            <solid
+                android:color="@color/input_pad_button_unpress" />
+        </shape>
+    </item>
+</selector>

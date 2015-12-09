@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@android:color/darker_gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.android.smartpay.TabIndicator
+            android:id="@+id/tab_input"
+            style="@style/MainTab"
+            app:icon_drawable="@drawable/tab_input" />
+
+        <com.android.smartpay.TabIndicator
+            android:id="@+id/tab_record"
+            style="@style/MainTab"
+            app:icon_drawable="@drawable/tab_record" />
+
+        <com.android.smartpay.TabIndicator
+            android:id="@+id/tab_setting"
+            style="@style/MainTab"
+            app:icon_drawable="@drawable/tab_setting" />
+    </LinearLayout>
+</LinearLayout>

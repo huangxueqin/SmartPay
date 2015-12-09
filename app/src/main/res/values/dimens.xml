@@ -1,0 +1,78 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- dimens for setting fragment -->
+    <dimen name="setting_content_padding_top">30dp</dimen>
+    <dimen name="setting_item_padding_horizontal">25dp</dimen>
+    <dimen name="setting_item_text">20sp</dimen>
+    <dimen name="setting_item_height">60dp</dimen>
+    <dimen name="setting_item_icon_size">25dp</dimen>
+
+
+    <!-- dimens for login -->
+    <dimen name="login_margin_horizontal">20dp</dimen>
+    <dimen name="login_input_height">121dp</dimen>
+    <dimen name="login_input_drawable_padding">10dp</dimen>
+    <dimen name="login_input_padding">10dp</dimen>
+    <dimen name="login_input_text">20sp</dimen>
+    <dimen name="login_button_text">20sp</dimen>
+    <dimen name="login_button_height">60dp</dimen>
+    <dimen name="login_button_margin_top">20dp</dimen>
+    <dimen name="login_cb_text">15sp</dimen>
+    <dimen name="login_cb_margin_top">10dp</dimen>
+
+    <!-- dimens for pay specific -->
+    <dimen name="ps_image_margin_top">100dp</dimen>
+    <dimen name="ps_image_size">90dp</dimen>
+    <dimen name="ps_margin_horizontal">25dp</dimen>
+    <dimen name="ps_item_margin_vertical_1">20dp</dimen>
+    <dimen name="ps_item_margin_vertical_2">15dp</dimen>
+    <dimen name="ps_cash_item_margin_bottom">60dp</dimen>
+    <dimen name="ps_text_1">40sp</dimen>
+    <dimen name="ps_text_2">20sp</dimen>
+    <dimen name="ps_text_3">15sp</dimen>
+    <dimen name="ps_btn_height">50dp</dimen>
+
+    <!-- dimens for order specific -->
+    <dimen name="os_money_zone_height">180dp</dimen>
+    <dimen name="os_item_min_height">60dp</dimen>
+    <dimen name="os_money_padding_left">50dp</dimen>
+    <dimen name="os_order_info_image_size">40dp</dimen>
+    <dimen name="os_money_text">50sp</dimen>
+    <dimen name="os_text_1">20sp</dimen>
+    <dimen name="os_text_2">18sp</dimen>
+    <dimen name="os_item_padding_horizontal">20dp</dimen>
+
+    <!-- dimens for fragment record -->
+    <dimen name="fr_item_padding">10dp</dimen>
+    <dimen name="fr_button_margin_horizontal">10dp</dimen>
+    <dimen name="fr_panel_height">200dp</dimen>
+    <dimen name="fr_button_height">60dp</dimen>
+    <dimen name="fr_list_item_height">80dp</dimen>
+    <dimen name="fr_list_icon_size">40dp</dimen>
+    <dimen name="fr_list_icon_padding">5dp</dimen>
+    <dimen name="fr_text_1">30sp</dimen>
+    <dimen name="fr_text_2">20sp</dimen>
+    <dimen name="fr_text_3">15sp</dimen>
+    <dimen name="fr_image_forward_size">25dp</dimen>
+    
+    <!-- dimens for order list activity -->
+    <dimen name="ola_spinner_width">100dp</dimen>
+    <dimen name="ola_spinner_height">40dp</dimen>
+    <dimen name="ola_spinner_item_padding_vertical">5dp</dimen>
+    <dimen name="ola_list_item_height">80dp</dimen>
+    <dimen name="ola_list_padding">10dp</dimen>
+    <dimen name="ola_text_1">20sp</dimen>
+    <dimen name="ola_text_2">16sp</dimen>
+
+    <!-- dimens for statistic activity -->
+    <dimen name="sa_spinner1_width">100dp</dimen>
+    <dimen name="sa_spinner2_width">120dp</dimen>
+    <dimen name="sa_padding_horizontal">15dp</dimen>
+    <dimen name="sa_list_title_height">40dp</dimen>
+    <dimen name="sa_list_height">60dp</dimen>
+    <dimen name="sa_text_1">18sp</dimen>
+    <dimen name="sa_chart_title_padding">15dp</dimen>
+</resources>

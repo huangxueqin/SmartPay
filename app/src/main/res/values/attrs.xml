@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TabIndicator">
+        <attr name="state_selected" format="boolean" />
+        <attr name="icon_drawable" format="reference" />
+    </declare-styleable>
+
+
+    <declare-styleable name="ViewFinderView">
+        <attr name="frame_color" format="color" />
+        <attr name="corner_color" format="color" />
+        <attr name="money_color" format="color" />
+        <attr name="prompt_color" format="color" />
+        <attr name="mask_color" format="color" />
+        <attr name="mask_alpha" format="integer" />
+        <attr name="corner_width" format="dimension" />
+        <attr name="window_width" format="dimension" />
+        <attr name="window_height" format="dimension" />
+        <attr name="money_size" format="dimension" />
+        <attr name="prompt_size" format="dimension" />
+        <attr name="window_centerX" format="float" />
+        <attr name="window_centerY" format="float" />
+    </declare-styleable>
+
+
+    <!-- seuic viewfinderview-->
+    <!--<declare-styleable name="FinderView">-->
+        <!--<attr name="weightOfWidth" format="float" />-->
+        <!--<attr name="weightOfHeight" format="float" />-->
+        <!--<attr name="boder_width" format="integer" />-->
+        <!--<attr name="corner_width" format="integer" />-->
+        <!--<attr name="corner_height" format="integer" />-->
+        <!--<attr name="offsetX" format="integer" />-->
+        <!--<attr name="offsetY" format="integer" />-->
+        <!--<attr name="find_image" format="reference" />-->
+        <!--<attr name="background_color" format="color" />-->
+        <!--<attr name="border_color" format="color" />-->
+        <!--<attr name="corner_color" format="color" />-->
+        <!--<attr name="background_alpha" format="integer" />-->
+        <!--<attr name="speed">-->
+            <!--<enum name="fast" value="15" />-->
+            <!--<enum name="normal" value="10" />-->
+            <!--<enum name="slow" value="5" />-->
+        <!--</attr>-->
+    <!--</declare-styleable>-->
+</resources>

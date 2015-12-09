@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <gradient android:angle="0"
+                android:startColor="@color/viewfinder_laser_start"
+                android:centerColor="@color/viewfinder_laser"
+                android:endColor="@color/viewfinder_laser_start" />
+        </shape>
+    </item>
+</selector>

@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">慧支付</string>
+    <string name="we_chat">微信</string>
+    <string name="qq">QQ</string>
+
+    <!-- strings for capture activity -->
+    <string name="ca_title_wechat">微信刷卡收款</string>
+    <string name="ca_title_qq">QQ钱包刷卡收款</string>
+    <string name="ca_prompt">扫描消费者的付款码完成交易</string>
+    <string name="ca_bt_wechat">微信二维码收款</string>
+    <string name="ca_bt_qq">QQ钱包收款</string>
+
+    <!-- strings for setting fragmet -->
+    <string name="setting_title">设置</string>
+    <string name="setting_item_use_help">使用帮助</string>
+    <string name="setting_item_business_rule">业务规则</string>
+    <string name="setting_item_contact">联系我们</string>
+    <string name="setting_menu_logout">退出</string>
+
+    <!-- strings for record fragment -->
+    <string name="record_title">账单</string>
+
+
+    <!-- strings for login -->
+    <string name="login_hint_username">用户名</string>
+    <string name="login_hint_password">密码</string>
+    <string name="login_cb">记住账号</string>
+    <string name="login_button">登陆</string>
+    
+    <!-- strings for pay specific -->
+    <string name="ps_title">交易详情</string>
+    <string name="ps_already_paid">已收款</string>
+    <string name="ps_lookup_order">查看账单</string>
+    <string name="ps_btn_continue">继续收款</string>
+    <string name="ps_cash_time">收款时间：</string>
+
+    <!-- strings for order specific -->
+    <string name="os_title">账单详情</string>
+    <string name="os_success_prompt">交易成功</string>
+    <string name="os_order_info">订单信息:</string>
+    <string name="os_product_info">商品信息</string>
+    <string name="os_cash_info">付款明细</string>
+    <string name="os_create_time">创建时间</string>
+
+    <!-- strings for record fragment-->
+    <string name="fr_month_income">本月收入</string>
+    <string name="fr_month_orders">本月笔数</string>
+    <string name="fr_order_unit">笔</string>
+    <string name="fr_button">数据统计</string>
+    <string name="fr_most_recent_order">最近一笔</string>
+    <string name="fr_today">今天</string>
+    <string name="fr_week">本周</string>
+
+    <!-- strings for order list activity -->
+    <string-array name="ola_spinner">
+        <item>今天</item>
+        <item>本周</item>
+        <item>本月</item>
+    </string-array>
+
+
+    <!-- strings for statistic activity -->
+    <string-array name="sa_spinner_1">
+        <item>订单量</item>
+        <item>交易额</item>
+    </string-array>
+
+    <string-array name="sa_spinner_2">
+        <item>最近7天</item>
+        <item>最近30天</item>
+    </string-array>
+
+    <string name="sa_date">日期</string>
+    <string name="sa_order_quantity">订单量</string>
+    <string name="sa_chart_title_week_num">统计一周内店铺的订单量</string>
+    <string name="sa_chart_title_week_money">统计一周内店铺的交易额</string>
+    <string name="sa_chart_title_month_num">统计一月内店铺的订单量</string>
+    <string name="sa_chart_title_month_money">统计一月内店铺的交易额</string>
+    <string name="sa_info_title_money">交易额</string>
+    <string name="sa_info_title_num">订单量</string>
+</resources>

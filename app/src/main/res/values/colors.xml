@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<color name="colorPrimary">#3F51B5</color>-->
+    <!--<color name="colorPrimaryDark">#303F9F</color>-->
+    <color name="colorPrimary">#ff5722</color>
+    <color name="colorPrimaryDark">#e64a19</color>
+
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorWhiteHalfTransparent">#a0FFFFFF</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorGray">#CBCBCB</color>
+    <!-- colors for input pad -->
+    <color name="input_pad_button_unpress">@color/colorWhite</color>
+    <color name="input_pad_button_pressed">#B2DFDB</color>
+    <color name="input_pad_button_stroke">#a0a0a0</color>
+    <color name="input_pad_button_text">#555555</color>
+
+    <!-- colors for capture activity -->
+    <color name="viewfinder_mask">#55222222</color>
+    <color name="result_view">#55000000</color>
+    <color name="viewfinder_frame">#ff00bfff</color>
+    <color name="viewfinder_laser_start">#0000ff00</color>
+    <color name="viewfinder_laser">#a000ff00</color>
+    <color name="possible_result_points">#c0ffff00</color>
+    <color name="transparent_background">#60000000</color>
+</resources>
