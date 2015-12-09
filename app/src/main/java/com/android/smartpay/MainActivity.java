@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
             case Cons.REQUEST_LOGIN:
                 if(resultCode == RESULT_CANCELED) {
                     finish();
-                } else {
+                } else if(resultCode == RESULT_OK) {
                     mTargetFragmentOnActivityResult = mInputFragment;
                     Preferences preferences = new Preferences(this);
                     L(preferences.getUserAbilities());
