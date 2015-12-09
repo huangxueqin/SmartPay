@@ -30,7 +30,7 @@ public class TransactionResultActivity extends AppCompatActivity implements View
         mButton = (Button) findViewById(R.id.btn_continue);
         mLookup.setOnClickListener(this);
         mButton.setOnClickListener(this);
-        mTotalPrice.setText("￥"+ String.format("%.2f", getIntent().getFloatExtra(Cons.ARG_TOTAL_MONEY, 0)));
+        mTotalPrice.setText(getIntent().getStringExtra(Cons.ARG_TOTAL_MONEY));
         mCreateTime.setText("收钱时间:" + getIntent().getStringExtra(Cons.ARG_CREATE_TIME));
     }
 

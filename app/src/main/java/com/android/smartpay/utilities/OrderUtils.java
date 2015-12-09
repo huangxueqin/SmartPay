@@ -40,7 +40,7 @@ public class OrderUtils {
     }
 
     public static String getOrderSpec(OrderInfo order) {
-        return order.paytype + order.orderno;
+        return order.paytype + "-" + order.orderno;
     }
 
     public static Date getOrderDate(OrderInfo info) {

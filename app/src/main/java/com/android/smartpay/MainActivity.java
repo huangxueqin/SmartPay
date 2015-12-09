@@ -401,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
                 String signString = HttpService.SKEY + "order_id" + orderId +
                         "shop_user_id" + shopUserId +
                         "sign_method" + signMethod +
-                        "timeStamp" + timeStamp + HttpService.SKEY;
+                        "timestamp" + timeStamp + HttpService.SKEY;
                 String sign = HttpUtils.MD5Hash(signString);
                 List<BasicNameValuePair> queryParam = new ArrayList<>();
                 queryParam.add(new BasicNameValuePair("sign", sign));
@@ -413,8 +413,8 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
                 while (!mCancelPay) {
                     final OrderStatusResponse statusResponse = mHttpService.executeJsonGetSync(queryUrl, OrderStatusResponse.class);
                     if (!mCancelPay) {
-                        if (statusResponse != null && statusResponse.errcode != null && !statusResponse.errcode.equals("0")) {
-                            if (statusResponse.data.order.status == 1) {
+                        if (statusResponse != null && statusResponse.errcode != null && statusResponse.errcode.equals("0")) {
+                            if (statusResponse.data.order.status != 0) {
                                 mMainHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
