@@ -298,13 +298,9 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
                 }
                 break;
             case Cons.REQUEST_SCAN:
-                if(resultCode == RESULT_OK || (TEST_DEBUG)) {
+                if(resultCode == RESULT_OK) {
                     int payType = 0; //data.getIntExtra(ARG_PAY_TYPE, 2);
                     String authCode = null; //data.getStringExtra(ARG_SCAN_RESULT);
-                    if(TEST_DEBUG) {
-                        payType = 2;
-                        authCode = "34394839482948290849";
-                    }
                     float money = 1000; //data.getFloatExtra(ARG_MONEY, 0);
                     if(money > 0 && authCode != null) {
                         startPay(money, payType, authCode);

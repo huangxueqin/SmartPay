@@ -159,7 +159,7 @@ public class HttpService {
                 params.add(new BasicNameValuePair("sign_method", sign_method));
                 params.add(new BasicNameValuePair("sign", sign));
                 String urlStr = HttpUtils.buildUrlWithParams(HttpUtils.REFRESH_URL, params);
-                if(TEST_DEBUG) {
+                if(NORMAL_DEBUG) {
                     L("token refresh url: " + urlStr);
                 }
                 HttpURLConnection connection = null;
@@ -343,7 +343,7 @@ public class HttpService {
         }
         urlStr = makePostUrl(urlStr, params);
         HttpURLConnection connection = null;
-        if(TEST_DEBUG) {
+        if(NORMAL_DEBUG) {
             L(urlStr);
             L(params);
         }

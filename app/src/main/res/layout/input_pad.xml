@@ -82,9 +82,8 @@
         <Button
             android:id="@+id/qq_wallet"
             style="@style/button_normal_style"
-            android:background="@drawable/alipay_normal" />
+            android:background="@drawable/qq_pay_normal" />
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"

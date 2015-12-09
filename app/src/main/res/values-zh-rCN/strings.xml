@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">慧支付</string>
+    <string name="app_name">慧收款</string>
     <string name="we_chat">微信</string>
     <string name="qq">QQ</string>
 
@@ -25,7 +25,7 @@
     <string name="login_hint_username">用户名</string>
     <string name="login_hint_password">密码</string>
     <string name="login_cb">记住账号</string>
-    <string name="login_button">登陆</string>
+    <string name="login_button">登录</string>
     
     <!-- strings for pay specific -->
     <string name="ps_title">交易详情</string>
