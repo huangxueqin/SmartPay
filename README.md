@@ -1,1 +1,1 @@
-# SmartPay 0.1
+# SmartPay v0.1
