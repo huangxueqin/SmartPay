@@ -111,6 +111,6 @@
         <Button
             android:id="@+id/weichat_wallet"
             style="@style/button_normal_style"
-            android:background="@drawable/weipay_large_normal" />
+            android:background="@drawable/weipay_normal" />
     </LinearLayout>
 </LinearLayout>

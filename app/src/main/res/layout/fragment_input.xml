@@ -8,7 +8,7 @@
         android:id="@+id/display"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:textColor="#F0F0F0"
+        android:textColor="#888888"
         android:background="@drawable/calculator_display"
         android:paddingBottom="10dp" />
 

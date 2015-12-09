@@ -2,8 +2,11 @@
 <resources>
     <!--<color name="colorPrimary">#3F51B5</color>-->
     <!--<color name="colorPrimaryDark">#303F9F</color>-->
-    <color name="colorPrimary">#ff5722</color>
-    <color name="colorPrimaryDark">#e64a19</color>
+    <color name="colorPrimary">#3e454f</color>
+    <color name="colorPrimaryDark">#2b3037</color>
+
+    <!-- colors for main activity -->
+    <color name="bottom_tab">#C3C8D8</color>
 
     <color name="colorAccent">#FF4081</color>
     <color name="colorWhiteHalfTransparent">#a0FFFFFF</color>
@@ -23,4 +26,7 @@
     <color name="viewfinder_laser">#a000ff00</color>
     <color name="possible_result_points">#c0ffff00</color>
     <color name="transparent_background">#60000000</color>
+
+    <!-- colors for record fragment -->
+    <color name="rf_panel_color">#f8bd3f</color>
 </resources>

@@ -11,10 +11,15 @@ import android.widget.TextView;
 
 import com.android.smartpay.jsonbeans.OrderInfo;
 import com.android.smartpay.utilities.Cons;
+import com.android.smartpay.utilities.DateUtils;
+import com.android.smartpay.utilities.OrderUtils;
 import com.google.gson.Gson;
 
 import org.w3c.dom.Text;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,7 +31,8 @@ public class OrderListAdapter extends BaseAdapter {
     List<OrderInfo> todayOrders;
     List<OrderInfo> weekOrders;
     List<OrderInfo> monthOrders;
-    private int type;
+    Date today;
+    int type;
 
 
     public OrderListAdapter(Context context, int type, List<OrderInfo> todayOrders, List<OrderInfo> weekOrders, List<OrderInfo> monthOrders) {
@@ -35,6 +41,7 @@ public class OrderListAdapter extends BaseAdapter {
         this.monthOrders = monthOrders;
         this.context = context;
         this.type = type;
+        this.today = new Date();
     }
 
 
@@ -91,6 +98,14 @@ public class OrderListAdapter extends BaseAdapter {
         holder = (Holder) convertView.getTag();
         holder.price.setText(order.should_pay);
         holder.icon.setImageResource(order.status != 0 ? R.drawable.weipay_success : R.drawable.weipay_failed);
+        holder.info.setText(OrderUtils.getOrderSpec(order));
+        Date orderDate = OrderUtils.getOrderDate(order);
+        if(orderDate != null) {
+            SimpleDateFormat format = new SimpleDateFormat("MM-dd");
+            holder.date.setText(format.format(orderDate));
+            holder.week.setText(DateUtils.getWeekOfDate(orderDate));
+        }
+
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

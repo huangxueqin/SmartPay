@@ -64,7 +64,13 @@
                         android:id="@+id/icon"
                         android:layout_width="@dimen/os_order_info_image_size"
                         android:layout_height="@dimen/os_order_info_image_size" />
-
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/os_item_padding_horizontal"
+                        android:textSize="@dimen/os_text_1"
+                        android:text="@string/os_order_info"
+                        android:singleLine="true"/>
                     <TextView
                         android:id="@+id/status2"
                         android:layout_width="wrap_content"
@@ -88,7 +94,7 @@
                 android:paddingLeft="@dimen/os_item_padding_horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <LinearLayout
+                <!--<LinearLayout
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:layout_width="match_parent"
@@ -111,7 +117,7 @@
                 <View
                 android:layout_width="match_parent"
                 android:layout_height="1px"
-                android:background="@color/colorGray" />
+                android:background="@color/colorGray" /> -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
@@ -123,6 +129,9 @@
                         android:layout_height="wrap_content"
                         android:textSize="@dimen/os_text_1"
                         android:text="@string/os_cash_info"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
                     <TextView
                         android:id="@+id/item_money"
                         android:layout_marginRight="@dimen/os_item_padding_horizontal"

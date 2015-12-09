@@ -8,6 +8,7 @@
     android:padding="@dimen/ola_list_padding">
     <LinearLayout
         android:gravity="center"
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <TextView
