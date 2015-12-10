@@ -46,7 +46,8 @@
                     android:id="@+id/item_icon1"
                     android:layout_width="@dimen/fr_list_icon_size"
                     android:layout_height="@dimen/fr_list_icon_size"
-                    android:padding="@dimen/fr_list_icon_padding"/>
+                    android:padding="@dimen/fr_list_icon_padding"
+                    android:src="@drawable/record_most_recent"/>
                 <LinearLayout
                     android:focusable="false"
                     android:layout_toRightOf="@id/item_icon1"
@@ -119,7 +120,8 @@
                     android:id="@+id/item_icon2"
                     android:layout_width="@dimen/fr_list_icon_size"
                     android:layout_height="@dimen/fr_list_icon_size"
-                    android:padding="@dimen/fr_list_icon_padding"/>
+                    android:padding="@dimen/fr_list_icon_padding"
+                    android:src="@drawable/record_today"/>
                 <LinearLayout
                     android:focusable="false"
                     android:layout_toRightOf="@id/item_icon2"
@@ -187,7 +189,8 @@
                     android:id="@+id/item_icon3"
                     android:layout_width="@dimen/fr_list_icon_size"
                     android:layout_height="@dimen/fr_list_icon_size"
-                    android:padding="@dimen/fr_list_icon_padding"/>
+                    android:padding="@dimen/fr_list_icon_padding"
+                    android:src="@drawable/record_week"/>
                 <LinearLayout
                     android:focusable="false"
                     android:layout_toRightOf="@id/item_icon3"
@@ -255,7 +258,8 @@
                     android:id="@+id/item_icon4"
                     android:layout_width="@dimen/fr_list_icon_size"
                     android:layout_height="@dimen/fr_list_icon_size"
-                    android:padding="@dimen/fr_list_icon_padding"/>
+                    android:padding="@dimen/fr_list_icon_padding"
+                    android:src="@drawable/record_month"/>
                 <LinearLayout
                     android:focusable="false"
                     android:layout_toRightOf="@id/item_icon4"

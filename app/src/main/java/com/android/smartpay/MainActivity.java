@@ -242,13 +242,17 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
                 }
                 float money = data.getFloatExtra(Cons.ARG_MONEY, -1);
                 int requestCode = Cons.REQUEST_SCAN;
-                L("money is: " + money);
-                Intent intent = new Intent(this, CaptureActivity.class);
-                intent.putExtra(Cons.ARG_ACTION, action);
-                intent.putExtra(Cons.ARG_MONEY, money);
-                intent.putExtra(Cons.ARG_PERM, mPermission);
-                intent.putExtra(Cons.ARG_USER, new Gson().toJson(mUser));
-                startActivityForResult(intent, requestCode);
+                if(money >= 0.01f) {
+                    Intent intent = new Intent(this, CaptureActivity.class);
+                    intent.putExtra(Cons.ARG_ACTION, action);
+                    intent.putExtra(Cons.ARG_MONEY, money);
+                    intent.putExtra(Cons.ARG_PERM, mPermission);
+                    intent.putExtra(Cons.ARG_USER, new Gson().toJson(mUser));
+                    startActivityForResult(intent, requestCode);
+                }
+                else {
+                    T("金额至少是0.01元");
+                }
                 break;
             case Cons.ACTION_LOGOUT:
                 mHttpService.cancelAllRunningTasks();

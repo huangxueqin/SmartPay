@@ -6,7 +6,7 @@
     <color name="colorPrimaryDark">#2b3037</color>
 
     <!-- colors for main activity -->
-    <color name="bottom_tab">#C3C8D8</color>
+    <color name="bottom_tab">@color/colorWhite</color>
 
     <color name="colorAccent">#FF4081</color>
     <color name="colorWhiteHalfTransparent">#a0FFFFFF</color>
