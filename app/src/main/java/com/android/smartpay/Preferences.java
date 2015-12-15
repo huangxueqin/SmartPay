@@ -64,10 +64,7 @@ public class Preferences {
     }
 
     public void setLoginInfo(LoginResponse loginResponse) {
-        String userName = null;
-        String userBasic = null;
-        userName = loginResponse.data.shop_user.real_name;
-        userBasic = new Gson().toJson(loginResponse.data.shop_user);
+        String userBasic = new Gson().toJson(loginResponse.data.shop_user);
         String userAbi = new Gson().toJson(loginResponse.data.abilities);
         sp.edit()
                 .putString(KEY_USER_BASIC, userBasic)

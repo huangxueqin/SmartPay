@@ -14,6 +14,7 @@ import com.android.smartpay.jsonbeans.ErrorResponse;
 import com.android.smartpay.jsonbeans.LoginResponse;
 import com.android.smartpay.jsonbeans.TokenResponse;
 import com.android.smartpay.utilities.HttpUtils;
+import com.android.smartpay.utilities.StorageUtils;
 import com.google.gson.Gson;
 
 import org.apache.http.message.BasicNameValuePair;
@@ -176,7 +177,14 @@ public class HttpService {
                         if (NORMAL_DEBUG) {
                             L("result = " + result);
                         }
-                        TokenResponse tokenResponse = new Gson().fromJson(result, TokenResponse.class);
+                        TokenResponse tokenResponse = null;
+                        // in case response has broken format
+                        try {
+                            tokenResponse = new Gson().fromJson(result, TokenResponse.class);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                         if (tokenResponse != null && tokenResponse.errcode != null && tokenResponse.errcode.equals("0")) {
                             setAccessTokenLocked(tokenResponse.data.access_token,
                                     tokenResponse.data.refresh_token,
@@ -231,7 +239,9 @@ public class HttpService {
         params.add(new BasicNameValuePair("sign_method", sign_method));
         urlStr = HttpUtils.buildUrlWithParams(urlStr, params);
         if(NORMAL_DEBUG) {
+            D("login start");
             L("url is: " + urlStr);
+            D("url is: " + urlStr);
         }
         HttpURLConnection connection = null;
         try {
@@ -246,9 +256,16 @@ public class HttpService {
                 is.close();
                 if(NORMAL_DEBUG) {
                     L("result = " + result);
+                    D("result = " + result);
                 }
-                LoginResponse loginResponse = new Gson().fromJson(result, LoginResponse.class);
-                if(loginResponse.errcode == null || !loginResponse.errcode.equals("0")) {
+                LoginResponse loginResponse = null;
+                // in case response has broken format
+                try {
+                    loginResponse = new Gson().fromJson(result, LoginResponse.class);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if(loginResponse == null || loginResponse.errcode == null || !loginResponse.errcode.equals("0")) {
                     postError(callback, loginResponse.errcode, loginResponse.errmsg);
                 }
                 else {
@@ -263,8 +280,10 @@ public class HttpService {
             else {
                 if(NORMAL_DEBUG) {
                     L("response code = " + responseCode);
+                    D("response code = " + responseCode);
                     InputStream is = connection.getErrorStream();
                     L("error response = " + getResponseFromInputStream(is));
+                    D("error response = " + getResponseFromInputStream(is));
                     is.close();
                 }
                 else {
@@ -272,8 +291,10 @@ public class HttpService {
                 }
             }
         } catch (MalformedURLException e) {
+            D("MalformedURLException: " + e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
+            D("IOException: " + e.getMessage());
             e.printStackTrace();
         } finally {
             if(connection != null) {
@@ -303,7 +324,12 @@ public class HttpService {
                     L("result = " + result);
                 }
                 is.close();
-                return (T) new Gson().fromJson(result, clazz);
+                try {
+                    return (T) new Gson().fromJson(result, clazz);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
             else {
                 if (NORMAL_DEBUG) {
@@ -362,7 +388,12 @@ public class HttpService {
                     L(result);
                 }
                 is.close();
-                return (T) new Gson().fromJson(result, clazz);
+                try {
+                    return (T) new Gson().fromJson(result, clazz);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
             } else {
                 if (NORMAL_DEBUG) {
                     L("response code = " + responseCode);
@@ -468,10 +499,22 @@ public class HttpService {
                     if(NORMAL_DEBUG) {
                         L("result = " + result);
                     }
-                    ErrorResponse error = new Gson().fromJson(result, ErrorResponse.class);
+                    ErrorResponse error = null;
+                    try {
+                        new Gson().fromJson(result, ErrorResponse.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     if(error != null && error.errcode != null && error.errcode.equals("0")) {
-                        T t = (T) new Gson().fromJson(result, clazz);
-                        postComplete(this, callback, t);
+                        T t = null;
+                        try {
+                            t = (T) new Gson().fromJson(result, clazz);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        if(t != null) {
+                            postComplete(this, callback, t);
+                        }
                     }
                     else {
                         postError(this, callback, error.errcode, error.errmsg);
@@ -588,5 +631,8 @@ public class HttpService {
 
     private static void L(String msg) {
         Log.d(TAG, msg);
+    }
+    private static void D(String msg) {
+        StorageUtils.dumpLog(msg);
     }
 }

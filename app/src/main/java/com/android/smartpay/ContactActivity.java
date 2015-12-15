@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 import com.android.smartpay.R;
@@ -12,11 +13,15 @@ import com.android.smartpay.R;
  * Created by xueqin on 2015/11/29 0029.
  */
 public class ContactActivity extends AppCompatActivity {
+    WebView mWebView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
         setupToolbar();
+        mWebView = (WebView) findViewById(R.id.webview);
+        mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.loadUrl("file:///android_asset/setting/contact_us.html");
     }
 
     @Override

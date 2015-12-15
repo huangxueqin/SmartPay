@@ -12,11 +12,16 @@ import java.util.Date;
 public class DateUtils {
 
     public static int getMonth() {
-        return Calendar.getInstance().get(Calendar.MONTH);
+        Calendar ca = Calendar.getInstance();
+        ca.setTime(new Date());
+        // january is 0
+        return ca.get(Calendar.MONTH) + 1;
     }
 
     public static int getYear() {
-        return Calendar.getInstance().get(Calendar.YEAR);
+        Calendar ca = Calendar.getInstance();
+        ca.setTime(new Date());
+        return ca.get(Calendar.YEAR);
     }
 
     public static String getWeekOfDate(Date dt) {
