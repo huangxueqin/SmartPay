@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class HttpUtils {
     public static final String URL = "http://posapitest.vikduo.com";
-    public static final String LOGIN_URL = URL + "/v3/api/login";
+    public static final String LOGIN_URL = URL +  "/v3/api/login";
     public static final String REFRESH_URL = URL + "/v3/api/refresh";
     public static final String ORDER_SUBMIT_URL = URL + "/v3/cashier-order/add";
     public static final String ORDER_PAY_URL = URL + "/v3/order/pay";
