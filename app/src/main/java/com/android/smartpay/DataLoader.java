@@ -4,14 +4,13 @@ import android.os.AsyncTask;
 import android.telecom.Call;
 import android.util.Log;
 
+import com.android.smartpay.http.BasicNameValuePair;
 import com.android.smartpay.http.HttpService;
 import com.android.smartpay.jsonbeans.LoginResponse;
 import com.android.smartpay.jsonbeans.OrderInfo;
 import com.android.smartpay.jsonbeans.OrderListResponse;
 import com.android.smartpay.utilities.DateUtils;
 import com.android.smartpay.utilities.HttpUtils;
-
-import org.apache.http.message.BasicNameValuePair;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

@@ -12,16 +12,10 @@ import com.android.smartpay.Application;
 import com.android.smartpay.Preferences;
 import com.android.smartpay.http.decoder.JSONStreamDecoder;
 import com.android.smartpay.http.decoder.StreamDecoder;
-import com.android.smartpay.jsonbeans.ErrorResponse;
 import com.android.smartpay.jsonbeans.LoginResponse;
 import com.android.smartpay.jsonbeans.TokenResponse;
 import com.android.smartpay.utilities.HttpUtils;
 import com.android.smartpay.utilities.StorageUtils;
-import com.google.gson.Gson;
-
-import org.apache.http.message.BasicNameValuePair;
-
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -302,7 +296,7 @@ public class HttpService {
     }
 
     /**
-     * execute the http request synchronized
+     * execute the http request synchronously
      * @param decoder decoder input stream from http response to acquire specific object
      * @param method request method one of {@link RequestMethod}
      * @param params params[0] is url, if using post, then params[1] is the post entity
@@ -377,29 +371,37 @@ public class HttpService {
     }
 
     public <T> T executeJsonGetSync(String url, Class<T> clazz) {
-        return (T) executeHttpRequestSync(new JSONStreamDecoder(clazz), RequestMethod.GET, url);
+        return (T) executeHttpGetSync(url, new JSONStreamDecoder(clazz));
     }
 
     public <T> T executeJsonPostSync(String url, String params, Class<T> clazz) {
-        return (T) executeHttpRequestSync(new JSONStreamDecoder(clazz), RequestMethod.POST, url, params);
+        return (T) executeHttpPostSync(url, params, new JSONStreamDecoder(clazz));
     }
 
-    public <T> void executeJsonGetAsync(String url, final OnRequest<T> callback, Class<T> clazz) {
+    public <T> void executeHttpGetAsync(String url, StreamDecoder decoder, final OnRequest<T> callback) {
         if(callback == null) {
             throw new RuntimeException("should provide a callback");
         }
-        HttpRequestTask<T> httpTask = new HttpRequestTask<T>(callback, RequestMethod.GET, new JSONStreamDecoder(clazz));
+        HttpRequestTask<T> httpTask = new HttpRequestTask<>(callback, RequestMethod.GET, decoder);
         mRunningTasks.add(httpTask);
         httpTask.execute(url);
     }
 
-    public <T> void executeJsonPostAsync(String url, String jsonParams, final OnRequest<T> callback, Class<T> clazz) {
+    public <T> void executeHttpPostAsync(String url, String params, StreamDecoder decoder, final OnRequest<T> callback) {
         if(callback == null) {
             throw new RuntimeException("should provide a callback");
         }
-        HttpRequestTask<T> httpTask = new HttpRequestTask<T>(callback, RequestMethod.POST, new JSONStreamDecoder(clazz));
+        HttpRequestTask<T> httpTask = new HttpRequestTask<T>(callback, RequestMethod.POST, decoder);
         mRunningTasks.add(httpTask);
-        httpTask.execute(url, jsonParams);
+        httpTask.execute(url, params);
+    }
+
+    public <T> void executeJsonGetAsync(String url, Class<T> clazz, final OnRequest<T> callback) {
+        executeHttpGetAsync(url, new JSONStreamDecoder(clazz), callback);
+    }
+
+    public <T> void executeJsonPostAsync(String url, String params, Class<T> clazz, final OnRequest<T> callback) {
+        executeHttpPostAsync(url, params, new JSONStreamDecoder(clazz), callback);
     }
 
     /**

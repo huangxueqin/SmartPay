@@ -1,16 +1,12 @@
 package com.android.smartpay.utilities;
 
-import org.apache.http.message.BasicNameValuePair;
+import com.android.smartpay.http.BasicNameValuePair;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.Collator;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by xueqin on 2015/12/1 0001.
@@ -31,7 +27,7 @@ public class HttpUtils {
             sb.append("?");
             for (int i = 0; i < params.size(); i++) {
                 BasicNameValuePair pair = params.get(i);
-                sb.append(pair.getName() + "=" + pair.getValue());
+                sb.append(pair.name + "=" + pair.value);
                 if(i < params.size()-1) {
                     sb.append("&");
                 }

@@ -21,6 +21,7 @@ import com.android.smartpay.fragments.BaseFragment;
 import com.android.smartpay.fragments.InputFragment;
 import com.android.smartpay.fragments.RecordFragment;
 import com.android.smartpay.fragments.SettingFragment;
+import com.android.smartpay.http.BasicNameValuePair;
 import com.android.smartpay.http.HttpService;
 import com.android.smartpay.http.OnRequest;
 import com.android.smartpay.jsonbeans.LoginResponse;
@@ -35,8 +36,6 @@ import com.android.smartpay.utilities.Cons;
 import com.android.smartpay.utilities.HttpUtils;
 import com.android.smartpay.utilities.Permission;
 import com.google.gson.Gson;
-
-import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -504,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
         params.add(new BasicNameValuePair("shop_user_id", shop_user_id));
         params.add(new BasicNameValuePair("order_id", order_id));
         params.add(new BasicNameValuePair("sign", sign));
-        mHttpService.executeJsonGetAsync(HttpUtils.buildUrlWithParams(HttpUtils.ORDER_QUERY_SPEC_URL, params), callback, OrderSpecResponse.class);
+        mHttpService.executeJsonGetAsync(HttpUtils.buildUrlWithParams(HttpUtils.ORDER_QUERY_SPEC_URL, params),OrderSpecResponse.class,  callback);
     }
 
     private BroadcastReceiver mNetworkReceiver = new BroadcastReceiver() {
