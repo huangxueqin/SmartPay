@@ -9,8 +9,9 @@ public class ErrorResponse {
     public String errcode;
     public String errmsg;
 
-    public static ErrorResponse createInstance(String json) {
-        ErrorResponse err = new Gson().fromJson(json, ErrorResponse.class);
+    public static ErrorResponse obtainInstance(String json) {
+        ErrorResponse err = new ErrorResponse();
+
         return err;
     }
 }

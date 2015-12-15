@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.android.smartpay.Application;
 import com.android.smartpay.Preferences;
+import com.android.smartpay.http.decoder.JSONStreamDecoder;
+import com.android.smartpay.http.decoder.StreamDecoder;
 import com.android.smartpay.jsonbeans.ErrorResponse;
 import com.android.smartpay.jsonbeans.LoginResponse;
 import com.android.smartpay.jsonbeans.TokenResponse;
@@ -23,11 +25,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -45,6 +47,7 @@ public class HttpService {
 
     public static final int ERROR_TOKEN = 0xFF1;
     public static final int ERROR_TIMEOUT = 0xFF2;
+    public static final int ERROR_FORMAT = 0xFF3;
 
     public static final int CONNECTION_TIMEOUT = 4500;
     public static final int READ_TIMEOUT = 10000;
@@ -77,6 +80,9 @@ public class HttpService {
     private Object mAccessTokenLock = new Object();
     private HashSet<AsyncTask> mRunningTasks;
 
+    private JSONStreamDecoder mTokenDecoder;
+    private JSONStreamDecoder mLoginDecoder;
+
     private HttpService() {
         if(sApplicationContext == null) {
             throw new RuntimeException("Application Context is not set");
@@ -84,6 +90,9 @@ public class HttpService {
         mPreferences = new Preferences(sApplicationContext);
         mMainHandler = new Handler(sApplicationContext.getMainLooper());
         mRunningTasks = new HashSet<>();
+
+        mTokenDecoder = new JSONStreamDecoder(TokenResponse.class);
+        mLoginDecoder = new JSONStreamDecoder(LoginResponse.class);
     }
 
     public Handler getMainHandler() {
@@ -172,20 +181,9 @@ public class HttpService {
                     int responseCode = connection.getResponseCode();
                     if (responseCode == HttpURLConnection.HTTP_OK) {
                         InputStream is = connection.getInputStream();
-                        String result = getResponseFromInputStream(is);
+                        TokenResponse tokenResponse = (TokenResponse) mTokenDecoder.decode(is);
                         is.close();
-                        if (NORMAL_DEBUG) {
-                            L("result = " + result);
-                        }
-                        TokenResponse tokenResponse = null;
-                        // in case response has broken format
-                        try {
-                            tokenResponse = new Gson().fromJson(result, TokenResponse.class);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        if (tokenResponse != null && tokenResponse.errcode != null && tokenResponse.errcode.equals("0")) {
+                        if(tokenResponse != null) {
                             setAccessTokenLocked(tokenResponse.data.access_token,
                                     tokenResponse.data.refresh_token,
                                     tokenResponse.data.expires_in * 1000);
@@ -252,44 +250,31 @@ public class HttpService {
             int responseCode = connection.getResponseCode();
             if(responseCode == HttpURLConnection.HTTP_OK) {
                 InputStream is = connection.getInputStream();
-                String result = getResponseFromInputStream(is);
+                LoginResponse loginResponse = (LoginResponse) mLoginDecoder.decode(is);
                 is.close();
-                if(NORMAL_DEBUG) {
-                    L("result = " + result);
-                    D("result = " + result);
-                }
-                LoginResponse loginResponse = null;
-                // in case response has broken format
-                try {
-                    loginResponse = new Gson().fromJson(result, LoginResponse.class);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if(loginResponse == null || loginResponse.errcode == null || !loginResponse.errcode.equals("0")) {
-                    postError(callback, loginResponse.errcode, loginResponse.errmsg);
-                }
-                else {
+                if(loginResponse != null) {
                     setAccessToken(loginResponse.data.token.access_token,
                             loginResponse.data.token.refresh_token,
                             loginResponse.data.token.expires_in * 1000);
                     mPreferences.setLoginInfo(loginResponse);
                     postComplete(callback, (Void) null);
                 }
-                return;
+                else {
+                    postError(callback, mLoginDecoder.getErrCode(), mLoginDecoder.getErrMsg());
+                }
             }
             else {
                 if(NORMAL_DEBUG) {
                     L("response code = " + responseCode);
                     D("response code = " + responseCode);
                     InputStream is = connection.getErrorStream();
-                    L("error response = " + getResponseFromInputStream(is));
-                    D("error response = " + getResponseFromInputStream(is));
+                    L("error response = " + mLoginDecoder.decodeStringFromInputStream(is));
+                    D("error response = " + mLoginDecoder.decodeStringFromInputStream(is));
                     is.close();
                 }
-                else {
-                    postError(callback, String.valueOf(responseCode), "net work error");
-                }
+                postError(callback, String.valueOf(responseCode), "net work error");
             }
+            return;
         } catch (MalformedURLException e) {
             D("MalformedURLException: " + e.getMessage());
             e.printStackTrace();
@@ -302,49 +287,6 @@ public class HttpService {
             }
         }
         postError(callback, String.valueOf(ERROR_TIMEOUT), "time out");
-    }
-
-    public <T> T executeJsonGetSync(String url, Class<T> clazz) {
-        if(!updateAccessTokenIfNecessary()) {
-            return null;
-        }
-        url += "&access_token=" + getAccessToken();
-        if(NORMAL_DEBUG) {
-            L("url = " + url);
-        }
-        HttpURLConnection connection = null;
-        try {
-            connection = (HttpURLConnection) new URL(url).openConnection();
-            setPropertiesForGet(connection);
-            int responseCode = connection.getResponseCode();
-            if(responseCode == HttpURLConnection.HTTP_OK) {
-                InputStream is = connection.getInputStream();
-                String result = getResponseFromInputStream(is);
-                if(NORMAL_DEBUG) {
-                    L("result = " + result);
-                }
-                is.close();
-                try {
-                    return (T) new Gson().fromJson(result, clazz);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-            else {
-                if (NORMAL_DEBUG) {
-                    L("response code = " + responseCode);
-                    InputStream is = connection.getErrorStream();
-                    L("error response = " + getResponseFromInputStream(is));
-                    is.close();
-                }
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private String makePostUrl(String url, String params) {
@@ -360,48 +302,61 @@ public class HttpService {
         return HttpUtils.buildUrlWithParams(url, urlParams);
     }
 
-    // if connect timeout or network error return null
-    // else return an instance of T, but this instance can also represent for error response
-    // if the errcode of T is not "0"
-    public <T> T executeJsonPostSync(String urlStr, String params, Class<T> clazz) {
+    /**
+     * execute the http request synchronized
+     * @param decoder decoder input stream from http response to acquire specific object
+     * @param method request method one of {@link RequestMethod}
+     * @param params params[0] is url, if using post, then params[1] is the post entity
+     * @return
+     */
+    private Object executeHttpRequestSync(StreamDecoder decoder, RequestMethod method, String... params) {
         if(!updateAccessTokenIfNecessary()) {
             return null;
         }
-        urlStr = makePostUrl(urlStr, params);
-        HttpURLConnection connection = null;
-        if(NORMAL_DEBUG) {
-            L(urlStr);
-            L(params);
+        String url = params[0];
+        if(method == RequestMethod.GET) {
+            url += "&access_token=" + getAccessToken();
+        } else if(method == RequestMethod.POST) {
+            url = makePostUrl(url, params[1]);
         }
+
+        if(NORMAL_DEBUG) {
+            L("url = " + url);
+        }
+
+        Object o = null;
+        HttpURLConnection connection = null;
         try {
-            connection = (HttpURLConnection) new URL(urlStr).openConnection();
-            setPropertiesForPost(connection);
-            DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
-            dos.write(params.getBytes("UTF-8"));
-            dos.flush();
-            dos.close();
+            connection = (HttpURLConnection) new URL(url).openConnection();
+            if(method == RequestMethod.GET) {
+                setPropertiesForGet(connection);
+            } else if(method == RequestMethod.POST) {
+                setPropertiesForPost(connection);
+                String postParams = params[1];
+                DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
+                dos.write(postParams.getBytes("UTF-8"));
+                dos.flush();
+                dos.close();
+            }
+
             int responseCode = connection.getResponseCode();
-            if(responseCode == HttpURLConnection.HTTP_OK) {
+            if (responseCode == HttpURLConnection.HTTP_OK) {
                 InputStream is = connection.getInputStream();
-                String result = getResponseFromInputStream(is);
-                if(NORMAL_DEBUG) {
-                    L(result);
-                }
+                o = decoder.decode(is);
                 is.close();
-                try {
-                    return (T) new Gson().fromJson(result, clazz);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            } else {
+            }
+            else {
                 if (NORMAL_DEBUG) {
                     L("response code = " + responseCode);
                     InputStream is = connection.getErrorStream();
-                    L("error response = " + getResponseFromInputStream(is));
+                    L("error response = " + decoder.decodeStringFromInputStream(is));
                     is.close();
                 }
             }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -409,151 +364,104 @@ public class HttpService {
                 connection.disconnect();
             }
         }
-        return null;
+        return o;
+    }
+
+    public Object executeHttpPostSync(String url, String params, StreamDecoder decoder) {
+        return executeHttpRequestSync(decoder, RequestMethod.POST, url, params);
+    }
+
+    public Object executeHttpGetSync(String url, StreamDecoder decoder) {
+        return executeHttpRequestSync(decoder, RequestMethod.GET, url);
+    }
+
+    public <T> T executeJsonGetSync(String url, Class<T> clazz) {
+        return (T) executeHttpRequestSync(new JSONStreamDecoder(clazz), RequestMethod.GET, url);
+    }
+
+    public <T> T executeJsonPostSync(String url, String params, Class<T> clazz) {
+        return (T) executeHttpRequestSync(new JSONStreamDecoder(clazz), RequestMethod.POST, url, params);
     }
 
     public <T> void executeJsonGetAsync(String url, final OnRequest<T> callback, Class<T> clazz) {
         if(callback == null) {
             throw new RuntimeException("should provide a callback");
         }
-        if(!isConnected()) {
-            mMainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onNoConnection();
-                }
-            });
-            return;
-        }
-        JsonPostGetTask<T> task = new JsonPostGetTask<T>(callback, clazz, RequestMethod.GET);
-        mRunningTasks.add(task);
-        task.execute(url);
+        HttpRequestTask<T> httpTask = new HttpRequestTask<T>(callback, RequestMethod.GET, new JSONStreamDecoder(clazz));
+        mRunningTasks.add(httpTask);
+        httpTask.execute(url);
     }
 
     public <T> void executeJsonPostAsync(String url, String jsonParams, final OnRequest<T> callback, Class<T> clazz) {
         if(callback == null) {
             throw new RuntimeException("should provide a callback");
         }
-        if(!isConnected()) {
-            mMainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onNoConnection();
-                }
-            });
-            return ;
-        }
-        JsonPostGetTask<T> task = new JsonPostGetTask<T>(callback, clazz, RequestMethod.POST);
-        mRunningTasks.add(task);
-        task.execute(url, jsonParams);
+        HttpRequestTask<T> httpTask = new HttpRequestTask<T>(callback, RequestMethod.POST, new JSONStreamDecoder(clazz));
+        mRunningTasks.add(httpTask);
+        httpTask.execute(url, jsonParams);
     }
 
-    // used for async http request, either GET or POST, decided by "requestMethod"
-    // params[0] store url, if it is a POST request, then params[1] stores post params
-    private class JsonPostGetTask<T> extends AsyncTask<String, Void, Void> {
-//        private final String METHOD_NAME = "createInstance";
-        private OnRequest<T> callback;
-        private Class<T> clazz;
+    /**
+     * AsyncTask to execute http request asynchronously
+     * @param <T>
+     */
+    private class HttpRequestTask<T> extends AsyncTask<String, Void, Void> {
+        private WeakReference<OnRequest<T>> callback;
         private RequestMethod requestMethod;
+        private StreamDecoder decoder;
 
-        public JsonPostGetTask(OnRequest<T> callback, Class<T> clazz, RequestMethod requestMethod) {
-            this.callback = callback;
-            this.clazz = clazz;
+        public HttpRequestTask(OnRequest<T> callback, RequestMethod requestMethod, StreamDecoder decoder) {
+            this.callback = new WeakReference<OnRequest<T>>(callback);
             this.requestMethod = requestMethod;
+            this.decoder = decoder;
         }
 
         @Override
         protected Void doInBackground(String... params) {
-            if(!updateAccessTokenIfNecessary()) {
-                postError(this, callback, String.valueOf(ERROR_TOKEN), "access token acquire failed");
+            if(!isConnected()) {
+                // remove self from running tasks collection
+                mRunningTasks.remove(this);
+                if(callback.get() != null) {
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.get().onNoConnection();
+                        }
+                    });
+                }
                 return null;
             }
-            String url = params[0];
-            HttpURLConnection connection = null;
-            try {
-                if (requestMethod == RequestMethod.GET) {
-                    url += "&access_token=" + getAccessToken();
-                    connection = (HttpURLConnection) new URL(url).openConnection();
-                    setPropertiesForGet(connection);
-                }
-                else if(requestMethod == RequestMethod.POST) {
-                    String postParams = params[1];
-                    url = makePostUrl(url, postParams);
-                    connection = (HttpURLConnection) new URL(url).openConnection();
-                    setPropertiesForPost(connection);
-                    DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
-                    dos.write(postParams.getBytes("UTF-8"));
-                    dos.flush();
-                    dos.close();
-                }
 
-                if(NORMAL_DEBUG) {
-                    L("url = " + url);
-                }
-
-                int responseCode = connection.getResponseCode();
-                if(responseCode == HttpURLConnection.HTTP_OK) {
-                    InputStream is = connection.getInputStream();
-                    String result = getResponseFromInputStream(is);
-                    is.close();
-                    if(NORMAL_DEBUG) {
-                        L("result = " + result);
-                    }
-                    ErrorResponse error = null;
-                    try {
-                        new Gson().fromJson(result, ErrorResponse.class);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    if(error != null && error.errcode != null && error.errcode.equals("0")) {
-                        T t = null;
-                        try {
-                            t = (T) new Gson().fromJson(result, clazz);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        if(t != null) {
-                            postComplete(this, callback, t);
-                        }
-                    }
-                    else {
-                        postError(this, callback, error.errcode, error.errmsg);
-                    }
-                }
-                else {
-                    if(NORMAL_DEBUG) {
-                        L("response code = " + responseCode);
-                        InputStream is = connection.getErrorStream();
-                        L("error response = " + getResponseFromInputStream(is));
-                        is.close();
-                    }
-                    postError(this, callback, String.valueOf(responseCode), "net work error");
-                }
-                return null;
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if(connection != null) {
-                    connection.disconnect();
+            T t = (T) executeHttpRequestSync(decoder, requestMethod, params);
+            if(!isCancelled()) {
+                if (t != null) {
+                    postComplete(this, callback.get(), t);
+                } else if (decoder.getErrCode() != null) {
+                    postError(this, callback.get(), decoder.getErrCode(), decoder.getErrMsg());
+                } else {
+                    // timeout happens
+                    postError(this, callback.get(), String.valueOf(ERROR_TIMEOUT), "time out");
                 }
             }
-            postError(this, callback, String.valueOf(ERROR_TIMEOUT), "time out");
             return null;
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
         }
     }
 
     private <T> void postError(AsyncTask task, final OnRequest<T> callback, final String errcode, final String errmsg) {
         mRunningTasks.remove(task);
-        if(!task.isCancelled()) {
+        if(!task.isCancelled() && callback != null) {
             postError(callback, errcode, errmsg);
         }
     }
 
     private <T> void postComplete(AsyncTask task, final OnRequest<T> callback, final T t) {
         mRunningTasks.remove(task);
-        if(!task.isCancelled()) {
+        if(!task.isCancelled() && callback != null) {
             postComplete(callback, t);
         }
     }
@@ -598,17 +506,6 @@ public class HttpService {
             }
         }
         return false;
-    }
-
-    private static String getResponseFromInputStream(InputStream is) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int index = -1;
-        while((index = is.read(buffer)) != -1){
-            baos.write(buffer, 0, index);
-        }
-        String result = baos.toString("UTF-8");
-        baos.close();
-        return result;
     }
 
     private static void setPropertiesForGet(HttpURLConnection conn) throws ProtocolException {

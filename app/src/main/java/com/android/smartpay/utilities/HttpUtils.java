@@ -17,13 +17,13 @@ import java.util.Locale;
  */
 public class HttpUtils {
     public static final String URL = "http://posapitest.vikduo.com";
-    public static final String LOGIN_URL = URL + "/v1/api/login";
-    public static final String REFRESH_URL = URL + "/v1/api/refresh";
-    public static final String ORDER_SUBMIT_URL = URL + "/v1/cashier-order/add";
-    public static final String ORDER_PAY_URL = URL + "/v1/order/pay";
-    public static final String ORDER_QUERY_STATUS_URL = URL + "/v1/order/status";
-    public static final String ORDER_QUERY_SPEC_URL = URL + "/v1/order/get";
-    public static final String ORDER_LIST_URL = URL + "/v1/order/list";
+    public static final String LOGIN_URL = URL + "/v3/api/login";
+    public static final String REFRESH_URL = URL + "/v3/api/refresh";
+    public static final String ORDER_SUBMIT_URL = URL + "/v3/cashier-order/add";
+    public static final String ORDER_PAY_URL = URL + "/v3/order/pay";
+    public static final String ORDER_QUERY_STATUS_URL = URL + "/v3/order/status";
+    public static final String ORDER_QUERY_SPEC_URL = URL + "/v3/order/get";
+    public static final String ORDER_LIST_URL = URL + "/v3/order/list";
 
     public static String buildUrlWithParams(String url, List<BasicNameValuePair> params) {
         StringBuffer sb = new StringBuffer(url);
