@@ -41,6 +41,16 @@ public class JSONStreamDecoder extends StreamDecoder {
         return errcode;
     }
 
+    @Override
+    public void setErrCode(String errCode) {
+        errcode = errCode;
+    }
+
+    @Override
+    public void setErrMsg(String errMsg) {
+        errmsg = errMsg;
+    }
+
     /**
      * decode object from an input stream
      * @param is

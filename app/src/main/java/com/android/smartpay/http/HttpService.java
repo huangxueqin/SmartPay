@@ -68,7 +68,6 @@ public class HttpService {
 
     private static HttpService sINSTANCE;
     private static Context sApplicationContext;
-    private static byte[] buffer = new byte[1024];
 
     private long mLastAccessTokenTime = -1;
     private long mLastAccessTokenExpire = -1;
@@ -311,6 +310,8 @@ public class HttpService {
      */
     private Object executeHttpRequestSync(StreamDecoder decoder, RequestMethod method, String... params) {
         if(!updateAccessTokenIfNecessary()) {
+            decoder.setErrCode(String.valueOf(ERROR_TOKEN));
+            decoder.setErrMsg("update access token failed");
             return null;
         }
         String url = params[0];

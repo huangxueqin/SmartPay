@@ -38,6 +38,14 @@ public abstract class StreamDecoder {
         return null;
     }
 
+    public void setErrCode(String errCode) {
+
+    }
+
+    public void setErrMsg(String errMsg) {
+
+    }
+
     protected static void L(String msg) {
         Log.d("decode json----->", msg);
     }
