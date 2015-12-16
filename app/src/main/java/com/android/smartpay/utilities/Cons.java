@@ -48,4 +48,11 @@ public class Cons {
     // args for order specific activity
     public static final String ARG_ORDER = "order";
 
+    // message magic numbers
+    public static final int MSG_ORDER_SUBMIT_SUCCESS = 0xFFFF0;
+    public static final int MSG_ORDER_SUBMIT_FAILED = 0xFFFF1;
+    public static final int MSG_ORDER_PAY_SUCCESS = 0xFFFF2;
+    public static final int MSG_ORDER_PAY_FAILED = 0xFFFF3;
+    public static final int MSG_CANCEL_ORDER_PAY = 0xFFFF4;
+
 }

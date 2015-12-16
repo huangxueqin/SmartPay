@@ -40,7 +40,7 @@ public class DataLoader {
 
     private HttpService mHttpService;
     private LoginResponse.ShopUser mUser;
-    private boolean mLoadComplete = false;
+    private boolean mLoadComplete = true;
     private boolean mCancelLoad = false;
     private boolean mLoadFail = false;
     private List<Callback> mCallbacks;
@@ -252,10 +252,12 @@ public class DataLoader {
         mMostRecentOrder = null;
     }
 
-    public void setUser(LoginResponse.ShopUser user) {
+    public void setUser(LoginResponse.ShopUser user, boolean load) {
         mUser = user;
         clearData();
-        startLoad();
+        if(load) {
+            startLoad();
+        }
     }
 
     private String buildUrl(String page) {

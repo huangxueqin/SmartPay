@@ -4,12 +4,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.util.Log;
 
 import com.android.smartpay.Application;
-import com.android.smartpay.Preferences;
 import com.android.smartpay.http.decoder.JSONStreamDecoder;
 import com.android.smartpay.http.decoder.StreamDecoder;
 import com.android.smartpay.jsonbeans.LoginResponse;
@@ -33,11 +30,10 @@ import java.util.List;
  * Created by xueqin on 2015/12/1 0001.
  */
 public class HttpService {
+    private static final String TAG = "TAG----------->";
     private static final boolean NO_NETWORK_DEBUG = Application.NO_NETWORK_DEBUG;
     private static final boolean TEST_DEBUG = Application.TEST_DEBUG;
     private static final boolean NORMAL_DEBUG = Application.NORMAL_DEBUG;
-
-    private static final String TAG = "TAG----------->";
 
     public static final int ERROR_TOKEN = 0xFF1;
     public static final int ERROR_TIMEOUT = 0xFF2;
@@ -52,52 +48,27 @@ public class HttpService {
     public static final String SKEY = "101";
     public static final String PIN_CODE = "app_101";
 
-    private static Handler sWorkHandler;
-    private static HandlerThread sWorkThread;
-    static {
-        sWorkThread = new HandlerThread("worker");
-        sWorkThread.start();
-        sWorkHandler = new Handler(sWorkThread.getLooper());
-    }
-
     private static HttpService sINSTANCE;
-    private static Context sApplicationContext;
 
     private long mLastAccessTokenTime = -1;
     private long mLastAccessTokenExpire = -1;
     private String mAccessToken;
     private String mRefreshToken;
+    private String mAccountName;
 
-    private Preferences mPreferences;
-    private Handler mMainHandler;
     private Object mAccessTokenLock = new Object();
     private HashSet<AsyncTask> mRunningTasks;
-
     private JSONStreamDecoder mTokenDecoder;
     private JSONStreamDecoder mLoginDecoder;
 
     private HttpService() {
-        if(sApplicationContext == null) {
-            throw new RuntimeException("Application Context is not set");
-        }
-        mPreferences = new Preferences(sApplicationContext);
-        mMainHandler = new Handler(sApplicationContext.getMainLooper());
         mRunningTasks = new HashSet<>();
-
         mTokenDecoder = new JSONStreamDecoder(TokenResponse.class);
         mLoginDecoder = new JSONStreamDecoder(LoginResponse.class);
     }
 
-    public Handler getMainHandler() {
-        return mMainHandler;
-    }
-
-    public static Handler getWorkHandler() {
-        return sWorkHandler;
-    }
-
     public void close() {
-
+        cancelAllRunningTasks();
     }
 
     public static synchronized HttpService get() {
@@ -105,10 +76,6 @@ public class HttpService {
             sINSTANCE = new HttpService();
         }
         return sINSTANCE;
-    }
-
-    public static void setApplicationContext(Context context) {
-        sApplicationContext = context.getApplicationContext();
     }
 
     public boolean accessTokenValid() {
@@ -143,7 +110,7 @@ public class HttpService {
         }
         synchronized (mAccessTokenLock) {
             if(!accessTokenValid()) {
-                String username = mPreferences.getAccountName();
+                String username = mAccountName;
                 String timestamp = HttpUtils.getTimeStamp();
                 String platform = PLATFORM;
                 String sign_method = SIGN_METHOD;
@@ -208,7 +175,7 @@ public class HttpService {
 
     // not a async method, should not call it in main thread
     // if success, we write the user info into shared preferences directly here
-    public void userLogin(String username, String password, final OnRequest<Void> callback) {
+    public void userLogin(String username, String password, final OnRequest<LoginResponse> callback) {
         String urlStr = HttpUtils.LOGIN_URL;
         // sign
         String platform = PLATFORM;
@@ -230,11 +197,11 @@ public class HttpService {
         params.add(new BasicNameValuePair("sign_method", sign_method));
         urlStr = HttpUtils.buildUrlWithParams(urlStr, params);
         if(NORMAL_DEBUG) {
-            D("login start");
             L("url is: " + urlStr);
-            D("url is: " + urlStr);
         }
         HttpURLConnection connection = null;
+        String errcode = null;
+        String errmsg = null;
         try {
             URL url = new URL(urlStr);
             connection = (HttpURLConnection) url.openConnection();
@@ -249,46 +216,47 @@ public class HttpService {
                     setAccessToken(loginResponse.data.token.access_token,
                             loginResponse.data.token.refresh_token,
                             loginResponse.data.token.expires_in * 1000);
-                    mPreferences.setLoginInfo(loginResponse);
-                    postComplete(callback, (Void) null);
+                    mAccountName = username;
+                    callback.onComplete(loginResponse);
+                    return;
                 }
                 else {
-                    postError(callback, mLoginDecoder.getErrCode(), mLoginDecoder.getErrMsg());
+                    errcode = mLoginDecoder.getErrCode();
+                    errmsg = mLoginDecoder.getErrMsg();
                 }
             }
             else {
                 if(NORMAL_DEBUG) {
                     L("response code = " + responseCode);
-                    D("response code = " + responseCode);
                     InputStream is = connection.getErrorStream();
                     L("error response = " + mLoginDecoder.decodeStringFromInputStream(is));
-                    D("error response = " + mLoginDecoder.decodeStringFromInputStream(is));
                     is.close();
                 }
-                postError(callback, String.valueOf(responseCode), "net work error");
+                errcode = String.valueOf(responseCode);
+                errmsg = "网络错误";
             }
-            return;
         } catch (MalformedURLException e) {
-            D("MalformedURLException: " + e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
-            D("IOException: " + e.getMessage());
             e.printStackTrace();
         } finally {
             if(connection != null) {
                 connection.disconnect();
             }
         }
-        postError(callback, String.valueOf(ERROR_TIMEOUT), "time out");
+        if(errcode == null) {
+            errcode = String.valueOf(ERROR_TIMEOUT);
+            errmsg = "请求超时";
+        }
+        callback.onFail(errcode, errmsg);
     }
 
-    private String makePostUrl(String url, String params) {
+    private String buildUrlForPost(String url, String params) {
         String timeStamp = HttpUtils.getTimeStamp();
         String sign = HttpUtils.MD5Hash(SKEY + params + timeStamp + SKEY);
         // build url
         List<BasicNameValuePair> urlParams = new ArrayList<>();
         urlParams.add(new BasicNameValuePair("access_token", getAccessToken()));
-//        urlParams.add(new BasicNameValuePair("access_token", "7df79b725881fc745d4fc827bd8ca172"));
         urlParams.add(new BasicNameValuePair("timestamp", timeStamp));
         urlParams.add(new BasicNameValuePair("sign_method", SIGN_METHOD));
         urlParams.add(new BasicNameValuePair("sign", sign));
@@ -312,7 +280,7 @@ public class HttpService {
         if(method == RequestMethod.GET) {
             url += "&access_token=" + getAccessToken();
         } else if(method == RequestMethod.POST) {
-            url = makePostUrl(url, params[1]);
+            url = buildUrlForPost(url, params[1]);
         }
 
         if(NORMAL_DEBUG) {
@@ -421,29 +389,17 @@ public class HttpService {
 
         @Override
         protected Void doInBackground(String... params) {
-            if(!isConnected()) {
-                // remove self from running tasks collection
-                mRunningTasks.remove(this);
-                if(callback.get() != null) {
-                    mMainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.get().onNoConnection();
-                        }
-                    });
-                }
-                return null;
-            }
 
             T t = (T) executeHttpRequestSync(decoder, requestMethod, params);
-            if(!isCancelled()) {
+            mRunningTasks.remove(this);
+            if(!isCancelled() && callback.get() != null) {
                 if (t != null) {
-                    postComplete(this, callback.get(), t);
+                    callback.get().onComplete(t);
                 } else if (decoder.getErrCode() != null) {
-                    postError(this, callback.get(), decoder.getErrCode(), decoder.getErrMsg());
+                    callback.get().onFail(decoder.getErrCode(), decoder.getErrMsg());
                 } else {
                     // timeout happens
-                    postError(this, callback.get(), String.valueOf(ERROR_TIMEOUT), "time out");
+                    callback.get().onFail(String.valueOf(ERROR_TIMEOUT), "time out");
                 }
             }
             return null;
@@ -455,38 +411,6 @@ public class HttpService {
         }
     }
 
-    private <T> void postError(AsyncTask task, final OnRequest<T> callback, final String errcode, final String errmsg) {
-        mRunningTasks.remove(task);
-        if(!task.isCancelled() && callback != null) {
-            postError(callback, errcode, errmsg);
-        }
-    }
-
-    private <T> void postComplete(AsyncTask task, final OnRequest<T> callback, final T t) {
-        mRunningTasks.remove(task);
-        if(!task.isCancelled() && callback != null) {
-            postComplete(callback, t);
-        }
-    }
-
-    private <T> void postError(final OnRequest<T> callback, final String errcode, final String errmsg) {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                callback.onFail(errcode, errmsg);
-            }
-        });
-    }
-
-    private <T> void postComplete(final OnRequest<T> callback, final T t) {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                callback.onComplete(t);
-            }
-        });
-    }
-
     public void cancelAllRunningTasks() {
         Iterator<AsyncTask> it = mRunningTasks.iterator();
         while(it.hasNext()) {
@@ -494,21 +418,6 @@ public class HttpService {
             task.cancel(true);
             it.remove();
         }
-    }
-
-    public static boolean isConnected() {
-        ConnectivityManager cm = (ConnectivityManager) sApplicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm != null) {
-            NetworkInfo[] info = cm.getAllNetworkInfo();
-            if (info != null) {
-                for (int i = 0; i < info.length; ++i) {
-                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     private static void setPropertiesForGet(HttpURLConnection conn) throws ProtocolException {

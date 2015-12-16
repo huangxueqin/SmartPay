@@ -21,6 +21,7 @@ public class BusinessRuleActivity extends AppCompatActivity {
         setupToolbar();
         mWebView = (WebView) findViewById(R.id.webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.getSettings().setDefaultTextEncodingName("UTF-8");
         mWebView.loadUrl("file:///android_asset/setting/rules.html");
     }
 

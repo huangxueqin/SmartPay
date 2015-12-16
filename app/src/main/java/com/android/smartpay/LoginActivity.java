@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -17,6 +18,10 @@ import android.widget.Toast;
 
 import com.android.smartpay.http.HttpService;
 import com.android.smartpay.http.OnRequest;
+import com.android.smartpay.jsonbeans.LoginResponse;
+import com.android.smartpay.utilities.HttpUtils;
+
+import java.net.ResponseCache;
 
 /**
  * Created by xueqin on 2015/12/1 0001.
@@ -34,6 +39,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Preferences mPreferences;
     private boolean mIsLogin = false;
     private ProgressDialog mLoginDialog;
+    private Handler mMainHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +54,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mHttpService = HttpService.get();
         mPreferences = new Preferences(this);
+        mMainHandler = new Handler(getMainLooper());
         if (mPreferences.accountRemembered()) {
             mCbAccountRemember.setChecked(true);
             mEtUsername.setText(mPreferences.getAccountName());
             mEtPassword.setText(mPreferences.getAccountPassword());
         }
-        if (!HttpService.isConnected()) {
+        if (!HttpUtils.isConnected(this)) {
             T("没有网络连接");
             mLoginButton.setEnabled(false);
         }
@@ -69,7 +76,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private BroadcastReceiver mNetworkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(HttpService.isConnected()) {
+            if(HttpUtils.isConnected(LoginActivity.this)) {
                 mLoginButton.setEnabled(true);
             } else {
                 T("没有网络连接");
@@ -78,32 +85,37 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     };
 
-    OnRequest<Void> mLoginCallback = new OnRequest<Void>() {
+    OnRequest<LoginResponse> mLoginCallback = new OnRequest<LoginResponse>() {
         @Override
-        public void onNoConnection() {
-            T("没有网络连接");
-            mLoginButton.setEnabled(false);
-            mLoginDialog.dismiss();
-            mIsLogin = false;
-        }
-
-        @Override
-        public void onComplete(Void aVoid) {
-            mLoginDialog.dismiss();
-            if(mCbAccountRemember.isChecked()) {
-                String username = mEtUsername.getText().toString();
-                String password = mEtPassword.getText().toString();
-                mPreferences.saveAccountInfo(username, password);
-            }
-            setResult(RESULT_OK);
-            finish();
+        public void onComplete(final LoginResponse response) {
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    mPreferences.setLoginInfo(response);
+                    if(mCbAccountRemember.isChecked()) {
+                        String username = mEtUsername.getText().toString();
+                        String password = mEtPassword.getText().toString();
+                        mPreferences.saveAccountInfo(username, password);
+                    }
+                    mLoginDialog.dismiss();
+                    setResult(RESULT_OK);
+                    finish();
+                }
+            };
+            mMainHandler.post(r);
         }
 
         @Override
         public void onFail(String code, String msg) {
-            T("登陆失败，检查用户名或密码是否正确");
-            mLoginDialog.dismiss();
-            mIsLogin = false;
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    T("登陆失败，检查用户名或密码是否正确");
+                    mLoginDialog.dismiss();
+                    mIsLogin = false;
+                }
+            };
+            mMainHandler.post(r);
         }
     };
 

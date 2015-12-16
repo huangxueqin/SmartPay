@@ -15,10 +15,9 @@ import com.android.smartpay.utilities.DateUtils;
 import com.android.smartpay.utilities.OrderUtils;
 import com.google.gson.Gson;
 
-import org.w3c.dom.Text;
-
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +41,9 @@ public class OrderListAdapter extends BaseAdapter {
         this.context = context;
         this.type = type;
         this.today = new Date();
+        Collections.sort(this.todayOrders, orderCompar);
+        Collections.sort(this.weekOrders, orderCompar);
+        Collections.sort(this.monthOrders, orderCompar);
     }
 
 
@@ -72,6 +74,7 @@ public class OrderListAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
+        position = getCount() - 1 - position;
         if(type == Cons.TYPE_DAY) {
             return todayOrders.get(position);
         } else if(type == Cons.TYPE_WEEK) {
@@ -132,4 +135,16 @@ public class OrderListAdapter extends BaseAdapter {
         private TextView price;
         private TextView info;
     }
+
+    // order list should be sorted with earliest order display firstly. However if we
+    // sort the list descendingly, when add a new order, we must add the order at the
+    // beginning of the array list. This may result to a huge performance degradation
+    // when the list is large. So, here instead, we sort it ascendingly, and do some
+    // change in method {@link getItem} to let the displaying reverse.
+    private Comparator<OrderInfo> orderCompar = new Comparator<OrderInfo>() {
+        @Override
+        public int compare(OrderInfo lhs, OrderInfo rhs) {
+            return lhs.createtime.compareTo(rhs.createtime);
+        }
+    };
 }

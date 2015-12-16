@@ -47,6 +47,6 @@ public abstract class StreamDecoder {
     }
 
     protected static void L(String msg) {
-        Log.d("decode json----->", msg);
+        Log.d("decode stream----->", msg);
     }
 }

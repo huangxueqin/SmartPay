@@ -33,6 +33,8 @@
         <activity android:name=".BusinessRuleActivity" />
         <activity android:name=".UsingHelpActivity" />
         <activity android:name=".ContactActivity" />
+
+        <service android:name=".LocalPayService" />
     </application>
 
 </manifest>

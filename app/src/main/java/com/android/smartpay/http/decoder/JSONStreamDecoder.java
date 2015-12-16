@@ -19,7 +19,6 @@ public class JSONStreamDecoder extends StreamDecoder {
     public static String METHOD_NAME_NEW_INSTANCE = "obtainInstance";
 
     private Class<?> clazz;
-    private String errtype;
     private String errmsg;
     private String errcode;
 
