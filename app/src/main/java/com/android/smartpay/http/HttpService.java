@@ -83,6 +83,10 @@ public class HttpService {
             return true;
         }
         long currentMillis = android.os.SystemClock.uptimeMillis();
+        L("mLastAccessTokenTime = " + mLastAccessTokenTime);
+        L("mLastAccessTokenExpire = " + mLastAccessTokenExpire);
+        L("EXPIRE_TIME_REDUNDANCY = " + EXPIRE_TIME_REDUNDANCY);
+        L("currentMillis = " + currentMillis);
         return mLastAccessTokenTime + mLastAccessTokenExpire - currentMillis >= EXPIRE_TIME_REDUNDANCY;
     }
 
@@ -271,11 +275,14 @@ public class HttpService {
      * @return
      */
     private Object executeHttpRequestSync(StreamDecoder decoder, RequestMethod method, String... params) {
+        L("access_token = " + mAccessToken);
         if(!updateAccessTokenIfNecessary()) {
             decoder.setErrCode(String.valueOf(ERROR_TOKEN));
             decoder.setErrMsg("update access token failed");
             return null;
         }
+        L("update token = " + mAccessToken);
+
         String url = params[0];
         if(method == RequestMethod.GET) {
             url += "&access_token=" + getAccessToken();

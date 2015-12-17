@@ -69,7 +69,7 @@ public class OrderListAdapter extends BaseAdapter {
         final OrderInfo order = (OrderInfo) getItem(position);
         holder = (Holder) convertView.getTag();
         holder.price.setText(order.should_pay);
-        holder.icon.setImageResource(order.status != 0 ? R.drawable.weipay_success : R.drawable.weipay_failed);
+        holder.icon.setImageResource(OrderUtils.isOrderPaid(order) ? R.drawable.weipay_success : R.drawable.weipay_failed);
         holder.info.setText(OrderUtils.getOrderSpec(order));
         Date orderDate = OrderUtils.getOrderDate(order);
         if(orderDate != null) {

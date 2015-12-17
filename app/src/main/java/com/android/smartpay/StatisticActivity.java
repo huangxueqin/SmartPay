@@ -317,17 +317,18 @@ public class StatisticActivity extends AppCompatActivity {
 
         @Override
         public Object getItem(int position) {
+            int count = getCount();
             if(mTimeType == TIME_TYPE_30) {
                 if(mCategoryType == CATEGORY_TYPE_NUM) {
-                    return mThirtyDaysOrderNum.get(position);
+                    return mThirtyDaysOrderNum.get(count - 1 - position);
                 } else if(mCategoryType == CATEGORY_TYPE_MONEY) {
-                    return mThirtyDaysOrderMoney.get(position);
+                    return mThirtyDaysOrderMoney.get(count - 1 - position);
                 }
             } else if(mTimeType == TIME_TYPE_7) {
                 if(mCategoryType == CATEGORY_TYPE_NUM) {
-                    return mThirtyDaysOrderNum.get(23+position);
+                    return mThirtyDaysOrderNum.get(23+(count - 1 - position));
                 } else if(mCategoryType == CATEGORY_TYPE_MONEY) {
-                    return mThirtyDaysOrderMoney.get(23+position);
+                    return mThirtyDaysOrderMoney.get(23+(count - 1 - position));
                 }
             }
             return null;
@@ -347,7 +348,7 @@ public class StatisticActivity extends AppCompatActivity {
             }
             holder = (Holder) convertView.getTag();
             Object item = getItem(position);
-            final Date itemDate = dates.get(position + (mTimeType == TIME_TYPE_30 ? 0 : 23));
+            final Date itemDate = dates.get((getCount() - 1 - position) + (mTimeType == TIME_TYPE_30 ? 0 : 23));
             holder.date.setText(formatter.format(itemDate));
             if(mCategoryType == CATEGORY_TYPE_MONEY) {
                 holder.info.setText("￥ " + String.format("%.2f", (Float) item));

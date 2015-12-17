@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.smartpay">
+    package="com.android.smartpay"
+    android:versionName="1.0.1"
+    android:versionCode="1">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -24,16 +26,16 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".OrderSpecificActivity" />
-        <activity android:name=".TransactionResultActivity" />
-        <activity android:name=".CaptureActivity" />
-        <activity android:name=".OrderListActivity" />
-        <activity android:name=".StatisticActivity" />
+        <activity android:name=".LoginActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".OrderSpecificActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".TransactionResultActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".CaptureActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".OrderListActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".StatisticActivity" android:screenOrientation="portrait"/>
 
-        <activity android:name=".BusinessRuleActivity" />
-        <activity android:name=".UsingHelpActivity" />
-        <activity android:name=".ContactActivity" />
+        <activity android:name=".BusinessRuleActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".UsingHelpActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".ContactActivity" android:screenOrientation="portrait"/>
 
         <service android:name=".LocalPayService" />
     </application>

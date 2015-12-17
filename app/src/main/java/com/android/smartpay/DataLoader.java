@@ -119,6 +119,7 @@ public class DataLoader {
         mMonthOrders.add(order);
         mWeekOrders.add(order);
         mTodayOrders.add(order);
+        mDayOrder.get(mDayOrder.size()-1).add(order);
         mMostRecentOrder = order;
         for(Callback callback : mCallbacks) {
             callback.onNewOrderAdded(order);

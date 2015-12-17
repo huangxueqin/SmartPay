@@ -38,6 +38,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private HttpService mHttpService;
     private Preferences mPreferences;
     private boolean mIsLogin = false;
+    private boolean mLoginCancelled = false;
     private ProgressDialog mLoginDialog;
     private Handler mMainHandler;
 
@@ -133,10 +134,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void initProgressDialog() {
         if(mLoginDialog == null) {
             mLoginDialog = new ProgressDialog(this);
-            mLoginDialog.setMessage("正在登陆");
+            mLoginDialog.setMessage("正在登录，请稍候...");
             mLoginDialog.setIndeterminate(false);
             mLoginDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            mLoginDialog.setCancelable(false);
+//            mLoginDialog.setCancelable(false);
         }
     }
 

@@ -47,7 +47,7 @@ public class TabIndicator extends LinearLayout {
         }
     }
 
-    public void setIcon(int resId) {
+    public void setIconDrawableResource(int resId) {
         mIconDrawableId = resId;
         if(mIcon != null) {
             mIcon.setImageResource(mIconDrawableId);

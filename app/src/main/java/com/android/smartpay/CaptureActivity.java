@@ -36,6 +36,7 @@ public class CaptureActivity extends AppCompatActivity {
     private static final String TAG = "TAG---------->";
     private static final boolean DEBUG = Application.NO_NETWORK_DEBUG;
     public static final String SCAN_OK = "com.seuic.framework.scan_ok";
+    public static final long SCAN_DELAY = 2000;
 
     private TextView mTitle;
     private Preview mPreview;
@@ -252,8 +253,12 @@ public class CaptureActivity extends AppCompatActivity {
         protected void onPostExecute(String b) {
             super.onPostExecute(b);
             if(b == null) {
-//                Toast.makeText(CaptureActivity.this, "Nothing found", Toast.LENGTH_SHORT).show();
-                mCameraController.setAutoFocus();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCameraController.setAutoFocus();
+                    }
+                }, SCAN_DELAY);
                 return;
             }
             setResultAndFinish(true, b);
