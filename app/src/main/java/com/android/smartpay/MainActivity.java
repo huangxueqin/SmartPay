@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
     private DataLoader mLoader;
     private ProgressDialog mProgressDialog;
 
-    // booleans for pay
+    // booleans for paying order
     private boolean mCancelPay = false;
     private ProgressDialog mStartPayDialog;
 
@@ -236,6 +236,11 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
         switch(action) {
             case Cons.ACTION_QQ_PAY:
             case Cons.ACTION_WECHAT_PAY:
+                if(action == Cons.ACTION_QQ_PAY) {
+                    T("QQ钱包暂时不可用");
+                    return;
+                }
+
                 if((action == Cons.ACTION_QQ_PAY && !Permission.hasPermQQPay(mPermission)) ||
                         (action == Cons.ACTION_WECHAT_PAY && !Permission.hasPermWechatPay(mPermission))) {
                     T("没有权限");
@@ -269,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
                     return;
                 }
                 Intent i = new Intent(this, OrderListActivity.class);
-                i.putExtra(Cons.ARG_LIST_TYPE, data.getIntExtra(Cons.ARG_LIST_TYPE, Cons.TYPE_DAY));
+                i.putExtra(Cons.ARG_LIST_TYPE, data.getIntExtra(Cons.ARG_LIST_TYPE, Cons.TYPE_TODAY));
                 startActivityForResult(i, Cons.REQUEST_ORDER_LIST);
                 break;
             case Cons.ACTION_STATISTICS:

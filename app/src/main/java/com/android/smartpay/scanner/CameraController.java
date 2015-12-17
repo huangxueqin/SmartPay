@@ -40,17 +40,19 @@ public class CameraController {
         }
     }
 
-    public void openCamera() {
-        openCamera(mDefaultCameraId);
+    public boolean openCamera() {
+        return openCamera(mDefaultCameraId);
     }
 
-    public void openCamera(final int id) {
+    public boolean openCamera(final int id) {
         if (safeCameraOpen(id)) {
             Log.d(TAG, "camera open successfully");
             mPreview.setCamera(mCamera);
+            return true;
         }
         else {
             Log.e(TAG, "Camera open failed");
+            return false;
         }
     }
 

@@ -44,6 +44,7 @@ public class CaptureActivity extends AppCompatActivity {
 
     private CameraController mCameraController;
     private Camera.Size mPreviewSize;
+    private boolean mCameraOpenSuccess;
     private Rect mCropRect = new Rect();
     private QRCodeReader mReader;
     private byte[] data;
@@ -79,7 +80,7 @@ public class CaptureActivity extends AppCompatActivity {
 
         mCameraController = new CameraController(this, mPreview);
         mCameraController.registerCallback(mCameraControllerCallback);
-        mCameraController.openCamera();
+        mCameraOpenSuccess = mCameraController.openCamera();
         mReader = new QRCodeReader();
 	}
 
@@ -100,6 +101,7 @@ public class CaptureActivity extends AppCompatActivity {
     private View.OnClickListener mButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+
             if((mAction == Cons.ACTION_QQ_PAY && !Permission.hasPermWechatPay(mPermission)) ||
                     mAction == Cons.ACTION_WECHAT_PAY && !Permission.hasPermQQPay(mPermission)) {
                 T("没有权限" + (mAction == Cons.ACTION_QQ_PAY ? "微信支付" : "QQ支付"));
@@ -109,7 +111,9 @@ public class CaptureActivity extends AppCompatActivity {
                 mAction = Cons.ACTION_WECHAT_PAY;
             }
             else if(mAction == Cons.ACTION_WECHAT_PAY) {
-                mAction = Cons.ACTION_QQ_PAY;
+                T("QQ钱包暂时不可用");
+                return;
+//                mAction = Cons.ACTION_QQ_PAY;
             }
             setupViewByAction();
         }
@@ -165,12 +169,16 @@ public class CaptureActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mCameraController.startPreviewSafe();
+        if(mCameraOpenSuccess) {
+            mCameraController.startPreviewSafe();
+        }
     }
 
     @Override
 	protected void onPause() {
-        mCameraController.stopPreview();
+        if(mCameraOpenSuccess) {
+            mCameraController.stopPreview();
+        }
 		super.onPause();
 	}
 
@@ -305,7 +313,6 @@ public class CaptureActivity extends AppCompatActivity {
 				String text = intent.getStringExtra("scan_data");
 				Intent resultIntent = new Intent();
 				Bundle bundle = new Bundle();
-//				bundle.putString(FragmentListener.KEY_SCAN_RESULT, text);
 				resultIntent.putExtras(bundle);
 				CaptureActivity.this.setResult(RESULT_OK, resultIntent);
 				CaptureActivity.this.finish();

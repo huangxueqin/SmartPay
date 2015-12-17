@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="61dp"
     android:background="@color/bottom_tab"
     android:orientation="vertical">
 
@@ -19,16 +19,28 @@
         <com.android.smartpay.TabIndicator
             android:id="@+id/tab_input"
             style="@style/MainTab"
-            app:icon_drawable="@drawable/tab_input" />
+            app:icon_drawable="@drawable/tab_input">
+            <com.android.smartpay.IconView
+                android:layout_width="60dp"
+                android:layout_height="60dp" />
+            </com.android.smartpay.TabIndicator>
 
         <com.android.smartpay.TabIndicator
             android:id="@+id/tab_record"
             style="@style/MainTab"
-            app:icon_drawable="@drawable/tab_record" />
+            app:icon_drawable="@drawable/tab_record" >
+            <com.android.smartpay.IconView
+                android:layout_width="60dp"
+                android:layout_height="60dp" />
+            </com.android.smartpay.TabIndicator>
 
         <com.android.smartpay.TabIndicator
             android:id="@+id/tab_setting"
             style="@style/MainTab"
-            app:icon_drawable="@drawable/tab_setting" />
+            app:icon_drawable="@drawable/tab_setting" >
+            <com.android.smartpay.IconView
+                android:layout_width="60dp"
+                android:layout_height="60dp" />
+            </com.android.smartpay.TabIndicator>
     </LinearLayout>
 </LinearLayout>

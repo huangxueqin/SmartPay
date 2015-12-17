@@ -27,47 +27,20 @@ import java.util.List;
 public class OrderListAdapter extends BaseAdapter {
 
     Context context;
-    List<OrderInfo> todayOrders;
-    List<OrderInfo> weekOrders;
-    List<OrderInfo> monthOrders;
-    Date today;
-    int type;
+    List<OrderInfo> orders;
 
-
-    public OrderListAdapter(Context context, int type, List<OrderInfo> todayOrders, List<OrderInfo> weekOrders, List<OrderInfo> monthOrders) {
-        this.todayOrders = todayOrders;
-        this.weekOrders = weekOrders;
-        this.monthOrders = monthOrders;
+    public OrderListAdapter(Context context, List<OrderInfo> orders) {
         this.context = context;
-        this.type = type;
-        this.today = new Date();
-        Collections.sort(this.todayOrders, orderCompar);
-        Collections.sort(this.weekOrders, orderCompar);
-        Collections.sort(this.monthOrders, orderCompar);
-    }
-
-
-    public void setType(int type) {
-        if(type != this.type) {
-            if(type == Cons.TYPE_DAY) {
-                this.type = Cons.TYPE_DAY;
-            } else if(type == Cons.TYPE_WEEK) {
-                this.type = Cons.TYPE_WEEK;
-            } else if(type == Cons.TYPE_MONTH) {
-                this.type = Cons.TYPE_MONTH;
-            }
-            this.notifyDataSetChanged();
+        this.orders = orders;
+        if(orders != null) {
+            Collections.sort(orders, orderCompar);
         }
     }
 
     @Override
     public int getCount() {
-        if(type == Cons.TYPE_DAY) {
-            return todayOrders == null ? 0 : todayOrders.size();
-        } else if(type == Cons.TYPE_WEEK) {
-            return weekOrders == null ? 0 : weekOrders.size();
-        } else if(type == Cons.TYPE_MONTH) {
-            return monthOrders == null ? 0 : monthOrders.size();
+        if(orders != null) {
+            return orders.size();
         }
         return 0;
     }
@@ -75,12 +48,8 @@ public class OrderListAdapter extends BaseAdapter {
     @Override
     public Object getItem(int position) {
         position = getCount() - 1 - position;
-        if(type == Cons.TYPE_DAY) {
-            return todayOrders.get(position);
-        } else if(type == Cons.TYPE_WEEK) {
-            return weekOrders.get(position);
-        } else if(type == Cons.TYPE_MONTH) {
-            return monthOrders.get(position);
+        if(orders != null) {
+            return orders.get(position);
         }
         return null;
     }

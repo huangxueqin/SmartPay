@@ -168,6 +168,4 @@ public class LocalPayService extends Service {
             }
         }
     }
-
-
 }

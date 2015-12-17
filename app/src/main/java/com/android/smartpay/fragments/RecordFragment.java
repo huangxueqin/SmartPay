@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +18,8 @@ import com.android.smartpay.jsonbeans.OrderInfo;
 import com.android.smartpay.utilities.Cons;
 import com.android.smartpay.utilities.DateUtils;
 
-import org.w3c.dom.Text;
-
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by xueqin on 2015/11/26 0026.
@@ -34,6 +27,8 @@ import java.util.Locale;
 public class RecordFragment extends BaseFragment {
     Button mBtnStatistic;
 
+    View mPanelItemIncome;
+    View mPanelItemOrder;
     TextView mPanelMonth;
     TextView mPanelYear;
     TextView mPanelMonthIncome;
@@ -91,6 +86,10 @@ public class RecordFragment extends BaseFragment {
         mPanelMonthIncome = (TextView) rootView.findViewById(R.id.panel_month_income);
         mPanelMonthOrderCount = (TextView) rootView.findViewById(R.id.panel_month_orders);
         mPanelShopName = (TextView) rootView.findViewById(R.id.panel_shop_name);
+        mPanelItemIncome = rootView.findViewById(R.id.panel_item_income);
+        mPanelItemIncome.setOnClickListener(mClickListener);
+        mPanelItemOrder = rootView.findViewById(R.id.panel_item_order);
+        mPanelItemOrder.setOnClickListener(mClickListener);
 
         mBtnStatistic = (Button) rootView.findViewById(R.id.button_statistics);
         mBtnStatistic.setOnClickListener(mClickListener);
@@ -133,8 +132,8 @@ public class RecordFragment extends BaseFragment {
         Date sunday = DateUtils.getLastDayOfWeek();
         mItemWeekDate.setText(formatter2.format(monday) + " - " + formatter2.format(sunday));
 
-        Date firstDayOfMonth = DateUtils.getFirstDayOfMonth();
-        Date lastDayOfMonth = DateUtils.getLastDayOfMonth();
+        Date firstDayOfMonth = DateUtils.getFirstDayOfCurrentMonth();
+        Date lastDayOfMonth = DateUtils.getLastDayOfCurrentMonth();
         mItemMonthDate.setText(formatter2.format(firstDayOfMonth) + " - " + formatter2.format(lastDayOfMonth));
         mItemMonth.setText("" + month + "月");
     }
@@ -162,7 +161,7 @@ public class RecordFragment extends BaseFragment {
                     mListener.onEvent(null, Cons.ACTION_MOST_RECENT, null);
                     break;
                 case R.id.item_item_today:
-                    data.putExtra(Cons.ARG_LIST_TYPE, Cons.TYPE_DAY);
+                    data.putExtra(Cons.ARG_LIST_TYPE, Cons.TYPE_TODAY);
                     mListener.onEvent(null, Cons.ACTION_ORDER_LIST, data);
                     break;
                 case R.id.item_item_week:
@@ -170,6 +169,8 @@ public class RecordFragment extends BaseFragment {
                     mListener.onEvent(null, Cons.ACTION_ORDER_LIST, data);
                     break;
                 case R.id.item_item_month:
+                case R.id.panel_item_income:
+                case R.id.panel_item_order:
                     data.putExtra(Cons.ARG_LIST_TYPE, Cons.TYPE_MONTH);
                     mListener.onEvent(null, Cons.ACTION_ORDER_LIST, data);
                     break;

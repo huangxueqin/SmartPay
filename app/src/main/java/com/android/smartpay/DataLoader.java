@@ -1,7 +1,6 @@
 package com.android.smartpay;
 
 import android.os.AsyncTask;
-import android.telecom.Call;
 import android.util.Log;
 
 import com.android.smartpay.http.BasicNameValuePair;
@@ -11,6 +10,7 @@ import com.android.smartpay.jsonbeans.OrderInfo;
 import com.android.smartpay.jsonbeans.OrderListResponse;
 import com.android.smartpay.utilities.DateUtils;
 import com.android.smartpay.utilities.HttpUtils;
+import com.android.smartpay.utilities.OrderUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -133,6 +133,15 @@ public class DataLoader {
         return mSevenDayOrders;
     }
 
+    public List<OrderInfo> getOrderForDate(Date date) {
+        String key = mMapFormatter.format(date);
+        Integer index = mMap.get(key);
+        if(index != null) {
+            return mDayOrder.get(index);
+        }
+        return null;
+    }
+
     public List<OrderInfo> getMonthOrders() {
         return mMonthOrders;
     }
@@ -144,7 +153,9 @@ public class DataLoader {
     public float getMonthOrderMoney() {
         float money = 0;
         for(OrderInfo order : mMonthOrders) {
-            money += Float.valueOf(order.should_pay);
+            if(OrderUtils.isOrderPaid(order)) {
+                money += Float.valueOf(order.should_pay);
+            }
         }
         return money;
     }
@@ -160,7 +171,9 @@ public class DataLoader {
     public float getWeekOrderMoney() {
         float money = 0;
         for(OrderInfo order : mWeekOrders) {
-            money += Float.valueOf(order.should_pay);
+            if(OrderUtils.isOrderPaid(order)) {
+                money += Float.valueOf(order.should_pay);
+            }
         }
         return money;
     }
@@ -176,7 +189,9 @@ public class DataLoader {
     public float getTodayOrderMoney() {
         float money = 0;
         for(OrderInfo order : mTodayOrders) {
-            money += Float.valueOf(order.should_pay);
+            if(OrderUtils.isOrderPaid(order)) {
+                money += Float.valueOf(order.should_pay);
+            }
         }
         return money;
     }
@@ -194,7 +209,9 @@ public class DataLoader {
         String key = mMapFormatter.format(date);
         if(mMap.get(key) != null) {
             for(OrderInfo order : mDayOrder.get(mMap.get(key))) {
-                money += Float.valueOf(order.should_pay);
+                if(OrderUtils.isOrderPaid(order)) {
+                    money += Float.valueOf(order.should_pay);
+                }
             }
         }
         return money;
@@ -353,7 +370,7 @@ public class DataLoader {
                 if(totalPage-1 == currentPage) {
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-                    Date month = DateUtils.getFirstDayOfMonth();
+                    Date month = DateUtils.getFirstDayOfCurrentMonth();
                     int monthIndex = mMap.get(formatter.format(month));
                     for (int i = monthIndex; i < PAST_DAY_NUM; i++) {
                         mMonthOrders.addAll(mDayOrder.get(i));

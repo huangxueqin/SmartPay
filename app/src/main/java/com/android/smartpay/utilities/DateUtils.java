@@ -10,6 +10,7 @@ import java.util.Date;
  * Created by ni on 2015/12/7.
  */
 public class DateUtils {
+    private static final SimpleDateFormat sStandardFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     public static int getMonth() {
         Calendar ca = Calendar.getInstance();
@@ -59,16 +60,45 @@ public class DateUtils {
         return ca.getTime();
     }
 
-    public static Date getFirstDayOfMonth() {
+    public static Date getFirstDayOfCurrentMonth() {
         Calendar ca = Calendar.getInstance();
         ca.setTime(new Date());
         ca.set(Calendar.DAY_OF_MONTH, 1);
         return ca.getTime();
     }
 
-    public static Date getLastDayOfMonth() {
+    public static Date getLastDayOfCurrentMonth() {
         Calendar ca = Calendar.getInstance();
         ca.setTime(new Date());
+        ca.set(Calendar.DAY_OF_MONTH, ca.getActualMaximum(Calendar.DAY_OF_MONTH));
+        return ca.getTime();
+    }
+
+    /**
+     *
+     * @param month 0 - 11
+     * @return
+     */
+    public static Date getFirstDayOfMonth(int month) {
+        if(month < 0 ) month = 0;
+        if(month > 11) month = 11;
+        Calendar ca = Calendar.getInstance();
+        ca.set(Calendar.MONTH, month);
+        ca.set(Calendar.DAY_OF_MONTH, 1);
+        return ca.getTime();
+    }
+
+    /**
+     *
+     * @param month 0 - 11
+     * @return
+     */
+    public static Date getLastDayOfMonth(int month) {
+        if(month < 0 ) month = 0;
+        if(month > 11) month = 11;
+
+        Calendar ca = Calendar.getInstance();
+        ca.set(Calendar.MONTH, month);
         ca.set(Calendar.DAY_OF_MONTH, ca.getActualMaximum(Calendar.DAY_OF_MONTH));
         return ca.getTime();
     }
@@ -91,6 +121,19 @@ public class DateUtils {
             ca.add(Calendar.DAY_OF_MONTH, +1);
         }
         return ca.getTime();
+    }
+
+    public static String formatStandard(Date date) {
+        return sStandardFormatter.format(date);
+    }
+
+    public static Date parseStandard(String date) {
+        try {
+            return sStandardFormatter.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

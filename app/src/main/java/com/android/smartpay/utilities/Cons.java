@@ -4,7 +4,8 @@ package com.android.smartpay.utilities;
  * Created by xueqin on 2015/12/4 0004.
  */
 public class Cons {
-    public static final int TYPE_DAY = 0xF0;
+    public static final int TYPE_DAY = 0xF0-1;
+    public static final int TYPE_TODAY = 0xF0;
     public static final int TYPE_WEEK = 0xF1;
     public static final int TYPE_MONTH = 0xF2;
     public static final int TYPE_SEVEN = 0xF3;
@@ -47,6 +48,9 @@ public class Cons {
 
     // args for order specific activity
     public static final String ARG_ORDER = "order";
+
+    // args for order list activity
+    public static final String ARG_DATE = "date";
 
     // message magic numbers
     public static final int MSG_ORDER_SUBMIT_SUCCESS = 0xFFFF0;

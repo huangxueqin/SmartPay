@@ -1,5 +1,6 @@
 package com.android.smartpay;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,9 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.android.smartpay.utilities.Cons;
+import com.android.smartpay.utilities.DateUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -343,11 +347,8 @@ public class StatisticActivity extends AppCompatActivity {
             }
             holder = (Holder) convertView.getTag();
             Object item = getItem(position);
-            if(mTimeType == TIME_TYPE_30) {
-                holder.date.setText(formatter.format(dates.get(position)));
-            } else if(mTimeType == TIME_TYPE_7) {
-                holder.date.setText(formatter.format(dates.get(23+position)));
-            }
+            final Date itemDate = dates.get(position + (mTimeType == TIME_TYPE_30 ? 0 : 23));
+            holder.date.setText(formatter.format(itemDate));
             if(mCategoryType == CATEGORY_TYPE_MONEY) {
                 holder.info.setText("￥ " + String.format("%.2f", (Float) item));
             } else if(mCategoryType == CATEGORY_TYPE_NUM) {
@@ -356,7 +357,10 @@ public class StatisticActivity extends AppCompatActivity {
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Intent i = new Intent(StatisticActivity.this, OrderListActivity.class);
+                    i.putExtra(Cons.ARG_LIST_TYPE, Cons.TYPE_DAY);
+                    i.putExtra(Cons.ARG_DATE, DateUtils.formatStandard(itemDate));
+                    startActivity(i);
                 }
             });
             return convertView;
