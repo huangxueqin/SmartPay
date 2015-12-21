@@ -78,6 +78,16 @@ public class HttpService {
         return sINSTANCE;
     }
 
+    private boolean isErrcodeAccessTokenError(String errcode) {
+        return errcode != null && (errcode.equals("42012") || errcode.equals("42010"));
+    }
+
+    private void invalidAccessToken() {
+        synchronized (mAccessTokenLock) {
+            mLastAccessTokenExpire = 0;
+        }
+    }
+
     public boolean accessTokenValid() {
         if(NO_NETWORK_DEBUG) {
             return true;
@@ -333,6 +343,10 @@ public class HttpService {
             if(connection != null) {
                 connection.disconnect();
             }
+        }
+        if(isErrcodeAccessTokenError(decoder.getErrCode())) {
+            invalidAccessToken();
+            return executeHttpRequestSync(decoder, method, params);
         }
         return o;
     }

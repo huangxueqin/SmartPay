@@ -369,22 +369,21 @@ public class DataLoader {
                 currentPage = list.current_page;
 
                 if(totalPage-1 == currentPage) {
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
                     Date month = DateUtils.getFirstDayOfCurrentMonth();
-                    int monthIndex = mMap.get(formatter.format(month));
+                    int monthIndex = mMap.get(mMapFormatter.format(month));
                     for (int i = monthIndex; i < PAST_DAY_NUM; i++) {
                         mMonthOrders.addAll(mDayOrder.get(i));
                     }
 
                     Date week = DateUtils.getFirstDayOfWeek();
-                    int weekIndex = mMap.get(formatter.format(week));
+                    int weekIndex = mMap.get(mMapFormatter.format(week));
                     for (int i = weekIndex; i < PAST_DAY_NUM; i++) {
                         mWeekOrders.addAll(mDayOrder.get(i));
                     }
 
                     Date sevenDay = DateUtils.getSevenDaysBefore();
-                    int sevenDayIndex = mMap.get(formatter.format(sevenDay));
+                    int sevenDayIndex = mMap.get(mMapFormatter.format(sevenDay));
                     for (int i = sevenDayIndex; i < PAST_DAY_NUM; i++) {
                         mSevenDayOrders.addAll(mDayOrder.get(i));
                     }

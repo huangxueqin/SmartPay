@@ -103,13 +103,16 @@ public class CameraController {
         Camera.Size previewSize = mPreview.getPreviewSize();
         Camera.Parameters params = mCamera.getParameters();
         params.setPreviewSize(previewSize.width, previewSize.height);
-        // set picture size the same as preview size
-        params.setPictureSize(previewSize.width, previewSize.height);
-        params.setPictureFormat(ImageFormat.JPEG);
-        // set auto focus, we don't need here, will use setautofucus manually latter
+        // we need not taking picture, so settings of picture taking commented
+//         set picture size the same as preview size
+//        params.setPictureSize(previewSize.width, previewSize.height);
+//        Log.d(TAG, "preview.width = " + previewSize.width + ", preview.height = " + previewSize.height);
+//        params.setPictureFormat(ImageFormat.JPEG);
+//         set auto focus, we don't need here, will use setautofucus manually latter
 //		params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        mPreview.requestLayout();
         mCamera.setParameters(params);
+        mPreview.requestLayout();
+
         if(DisplayUtils.getScreenOrientation(mContext) == Configuration.ORIENTATION_PORTRAIT) {
             mCamera.setDisplayOrientation(90);
         }
@@ -198,7 +201,9 @@ public class CameraController {
     }
 
     public void setAutoFocus() {
-        mCamera.autoFocus(mAutoFocusCallback);
+        if(mCamera != null && mHasSurface) {
+            mCamera.autoFocus(mAutoFocusCallback);
+        }
     }
 
     public void cancelAutoFocus() {

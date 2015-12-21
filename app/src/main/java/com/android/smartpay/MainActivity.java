@@ -87,6 +87,10 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
 
         mPayServiceIntent = new Intent(this, LocalPayService.class);
         startService(mPayServiceIntent);
+
+        if(mLoginSuccess) {
+            onUserLogin();
+        }
     }
 
     private void setupToolbar() {
@@ -224,11 +228,16 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
         onFragmentSwitched();
     }
 
-    private void afterUserLogin() {
+    private void onUserLogin() {
+        mTargetFragmentOnActivityResult = mInputFragment;
+        Preferences preferences = new Preferences(this);
+        mUser = new Gson().fromJson(preferences.getUserBasic(), LoginResponse.ShopUser.class);
+        mPermission = Permission.buildPermission(new Gson().fromJson(preferences.getUserAbilities(), LoginResponse.Abilities.class));
         mRecordFragment.updateUserInfo(mUser);
         mInputFragment.updateUserInfo(mUser);
         mSettingFragment.updateUserInfo(mUser);
         mLoader.setUser(mUser, Permission.hasPermOrder(mPermission));
+        mLoginSuccess = true;
     }
 
     @Override
@@ -309,14 +318,7 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
                 if(resultCode == RESULT_CANCELED) {
                     finish();
                 } else if(resultCode == RESULT_OK) {
-                    mTargetFragmentOnActivityResult = mInputFragment;
-                    Preferences preferences = new Preferences(this);
-                    L(preferences.getUserAbilities());
-                    L(preferences.getUserBasic());
-                    mUser = new Gson().fromJson(preferences.getUserBasic(), LoginResponse.ShopUser.class);
-                    mPermission = Permission.buildPermission(new Gson().fromJson(preferences.getUserAbilities(), LoginResponse.Abilities.class));
-                    afterUserLogin();
-                    mLoginSuccess = true;
+                    onUserLogin();
                 }
                 break;
             case Cons.REQUEST_SCAN:
@@ -424,11 +426,15 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
                     break;
                 case Cons.MSG_ORDER_PAY_FAILED:
                     payFailed = true;
+                    mLoader.addNewOrder((OrderInfo)msg.obj);
                     mStartPayDialog.dismiss();
-                    T("订单支付失败");
+                    T("订单支付未成功");
                     break;
                 case Cons.MSG_CANCEL_ORDER_PAY:
                     payFailed = true;
+                    if(msg.obj != null) {
+                        mLoader.addNewOrder((OrderInfo) msg.obj);
+                    }
                     mStartPayDialog.dismiss();
                     T("订单取消");
                     break;

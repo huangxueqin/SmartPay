@@ -5,13 +5,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -19,24 +25,49 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.smartpay.scanner.CameraController;
-import com.android.smartpay.scanner.GrayLuminanceSource;
 import com.android.smartpay.scanner.Preview;
 import com.android.smartpay.scanner.Utils.DisplayUtils;
 import com.android.smartpay.scanner.ViewFinderView;
 import com.android.smartpay.utilities.Cons;
 import com.android.smartpay.utilities.Permission;
+import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
-import com.google.zxing.ChecksumException;
-import com.google.zxing.FormatException;
+import com.google.zxing.DecodeHintType;
+import com.google.zxing.LuminanceSource;
+import com.google.zxing.MultiFormatReader;
 import com.google.zxing.NotFoundException;
+import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
-import com.google.zxing.qrcode.QRCodeReader;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class CaptureActivity extends AppCompatActivity {
     private static final String TAG = "TAG---------->";
     private static final boolean DEBUG = Application.NO_NETWORK_DEBUG;
     public static final String SCAN_OK = "com.seuic.framework.scan_ok";
     public static final long SCAN_DELAY = 2000;
+
+    private static Set<BarcodeFormat> PRODUCT_FORMATS;
+    private static Set<BarcodeFormat> INDUSTRIAL_FORMATS;
+    static {
+        PRODUCT_FORMATS = EnumSet.of(BarcodeFormat.UPC_A,
+                BarcodeFormat.UPC_E,
+                BarcodeFormat.EAN_13,
+                BarcodeFormat.EAN_8,
+                BarcodeFormat.RSS_14,
+                BarcodeFormat.RSS_EXPANDED);
+        INDUSTRIAL_FORMATS = EnumSet.of(BarcodeFormat.CODE_39,
+                BarcodeFormat.CODE_93,
+                BarcodeFormat.CODE_128,
+                BarcodeFormat.ITF,
+                BarcodeFormat.CODABAR);
+    }
 
     private TextView mTitle;
     private Preview mPreview;
@@ -47,8 +78,10 @@ public class CaptureActivity extends AppCompatActivity {
     private Camera.Size mPreviewSize;
     private boolean mCameraOpenSuccess;
     private Rect mCropRect = new Rect();
-    private QRCodeReader mReader;
+    private MultiFormatReader mMultiFormatReader;
     private byte[] data;
+    private int[] rgbArray;
+    private boolean cancelDecode = false;
 
 
     private Handler mHandler;
@@ -82,7 +115,17 @@ public class CaptureActivity extends AppCompatActivity {
         mCameraController = new CameraController(this, mPreview);
         mCameraController.registerCallback(mCameraControllerCallback);
         mCameraOpenSuccess = mCameraController.openCamera();
-        mReader = new QRCodeReader();
+
+        // init barcode reader
+        mMultiFormatReader = new MultiFormatReader();
+        Map<DecodeHintType,Object> hints = new EnumMap<DecodeHintType,Object>(DecodeHintType.class);
+        // Add specific formats
+        List<BarcodeFormat> formats = new ArrayList<>();
+        formats.add(BarcodeFormat.QR_CODE);
+        formats.addAll(PRODUCT_FORMATS);
+        formats.addAll(INDUSTRIAL_FORMATS);
+        hints.put(DecodeHintType.POSSIBLE_FORMATS, formats);
+        mMultiFormatReader.setHints(hints);
 	}
 
     private void setupToolbar() {
@@ -154,6 +197,7 @@ public class CaptureActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        cancelDecode = true;
         setResultAndFinish();
     }
 
@@ -247,16 +291,20 @@ public class CaptureActivity extends AppCompatActivity {
         }
     };
 
-
     private class DecodeTask extends AsyncTask<byte[], Void, String> {
         @Override
         protected void onPostExecute(String b) {
             super.onPostExecute(b);
+            if(cancelDecode) {
+                return;
+            }
             if(b == null) {
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mCameraController.setAutoFocus();
+                        if(mCameraController != null) {
+                            mCameraController.setAutoFocus();
+                        }
                     }
                 }, SCAN_DELAY);
                 return;
@@ -270,41 +318,33 @@ public class CaptureActivity extends AppCompatActivity {
             String result = null;
             byte[] source = params[0];
             int sourceWidth = mPreviewSize.width;
+            int sourceHeight = mPreviewSize.height;
+            Bitmap b = YUV420spToBitmap(source, sourceWidth, sourceHeight, mCropRect);
             int dataWidth = mCropRect.width();
             int dataHeight = mCropRect.height();
-            if(data == null || data.length < dataWidth * dataHeight) {
-                data = new byte[dataWidth * dataHeight];
+            if(DisplayUtils.getScreenOrientation(CaptureActivity.this) == Configuration.ORIENTATION_PORTRAIT) {
+                // rotate 270
+                Matrix matrix = new Matrix();
+                matrix.postRotate(270);
+                b = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
+                dataHeight = mCropRect.width();
+                dataWidth = mCropRect.height();
             }
-
-            int left = mCropRect.left;
-            int top = mCropRect.top;
-            int sourceOffset = sourceWidth * top + left;
-            int dataOffset = 0;
-            for(int i = 0; i < dataHeight; i++) {
-                System.arraycopy(source, sourceOffset, data, dataOffset, dataWidth);
-                sourceOffset += sourceWidth;
-                dataOffset += dataWidth;
+            if(cancelDecode) {
+                return null;
             }
-            // for testing
-//            Bitmap b = Bitmap.createBitmap(dataWidth, dataHeight, Bitmap.Config.ARGB_8888);
-//            for(int i = 0; i < dataWidth; i++) {
-//                for(int j = 0; j < dataHeight; j++) {
-//                    byte gray = data[dataWidth*j + i];
-//                    b.setPixel(i, j, (0xff000000 | gray << 16 | gray << 8 | gray));
-//                }
-//            }
-//            return b;
-
-            GrayLuminanceSource luminanceSource = new GrayLuminanceSource(dataWidth, dataHeight, data);
-            HybridBinarizer binarizer = new HybridBinarizer(luminanceSource);
+            if(rgbArray == null) {
+                rgbArray = new int[dataWidth * dataHeight];
+            }
+            b.getPixels(rgbArray, 0, b.getWidth(), 0, 0, b.getWidth(), b.getHeight());
+            LuminanceSource luminance = new RGBLuminanceSource(dataWidth, dataHeight, rgbArray);
+            BinaryBitmap bb = new BinaryBitmap(new HybridBinarizer(luminance));
             try {
-                result = mReader.decode(new BinaryBitmap(binarizer)).getText();
+                result = mMultiFormatReader.decodeWithState(bb).getText();
             } catch (NotFoundException e) {
                 e.printStackTrace();
-            } catch (ChecksumException e) {
-                e.printStackTrace();
-            } catch (FormatException e) {
-                e.printStackTrace();
+            } finally {
+                mMultiFormatReader.reset();
             }
             return result;
         }
@@ -324,4 +364,20 @@ public class CaptureActivity extends AppCompatActivity {
 			}
 		}
 	};
+
+    private static Bitmap YUV420spToBitmap(byte[] yuv, int width, int height, Rect cropRect) {
+        YuvImage yuvImage = new YuvImage(yuv, ImageFormat.NV21, width, height, null);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        if(cropRect == null) {
+            cropRect = new Rect(0, 0, width, height);
+        }
+        yuvImage.compressToJpeg(cropRect, 80, baos);
+        byte[] data = baos.toByteArray();
+        Bitmap b = BitmapFactory.decodeByteArray(data, 0, data.length);
+        return b;
+    }
+
+    private static void L(String msg) {
+        Log.d(TAG, msg);
+    }
 }

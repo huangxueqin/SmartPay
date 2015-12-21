@@ -12,15 +12,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.smartpay.CalculatorDisplay;
-import com.android.smartpay.FragmentListener;
 import com.android.smartpay.R;
 import com.android.smartpay.jsonbeans.LoginResponse;
 import com.android.smartpay.utilities.Cons;
 
-import java.util.Stack;
+import java.math.BigDecimal;
 
 /**
  * Created by xueqin on 2015/11/26 0026.
@@ -28,16 +27,12 @@ import java.util.Stack;
 public class InputFragment extends BaseFragment implements View.OnClickListener{
     private static final String TAG = "TAG--------->";
 
-    private static final int TYPE_ZERO = 0x1 << 6;
-    private static final int TYPE_DIGIT = 0x1;
-    private static final int TYPE_PLUS = 0x1 << 1;
-    private static final int TYPE_POINT = 0x1 << 2;
-    private static final int TYPE_EQUAL = 0x1 << 3;
-    private static final int TYPE_BACK = 0x1 << 4;
-    private static final int TYPE_PAY = 0x1 << 5;
+    enum Type {
+        TYPE_ZERO, TYPE_DIGIT, TYPE_PLUS, TYPE_POINT, TYPE_EQUAL, TYPE_BACK, TYPE_PAY
+    }
 
     private static SparseArray<String> sButtonContent;
-    private static SparseArray<Integer> sButtonType;
+    private static SparseArray<Type> sButtonType;
     static {
         sButtonContent = new SparseArray<>(12);
         sButtonContent.put(R.id.digit0, "0"); sButtonContent.put(R.id.digit1, "1");
@@ -48,14 +43,14 @@ public class InputFragment extends BaseFragment implements View.OnClickListener{
         sButtonContent.put(R.id.plus, "+"); sButtonContent.put(R.id.point, ".");
 
         sButtonType = new SparseArray<>(16);
-        sButtonType.put(R.id.digit0, TYPE_ZERO); sButtonType.put(R.id.digit1, TYPE_DIGIT);
-        sButtonType.put(R.id.digit2, TYPE_DIGIT); sButtonType.put(R.id.digit3, TYPE_DIGIT);
-        sButtonType.put(R.id.digit4, TYPE_DIGIT); sButtonType.put(R.id.digit5, TYPE_DIGIT);
-        sButtonType.put(R.id.digit6, TYPE_DIGIT); sButtonType.put(R.id.digit7, TYPE_DIGIT);
-        sButtonType.put(R.id.digit8, TYPE_DIGIT); sButtonType.put(R.id.digit9, TYPE_DIGIT);
-        sButtonType.put(R.id.back, TYPE_BACK); sButtonType.put(R.id.plus, TYPE_PLUS);
-        sButtonType.put(R.id.point, TYPE_POINT); sButtonType.put(R.id.qq_wallet, TYPE_PAY);
-        sButtonType.put(R.id.weichat_wallet, TYPE_PAY); sButtonType.put(R.id.equal, TYPE_EQUAL);
+        sButtonType.put(R.id.digit0, Type.TYPE_ZERO); sButtonType.put(R.id.digit1, Type.TYPE_DIGIT);
+        sButtonType.put(R.id.digit2, Type.TYPE_DIGIT); sButtonType.put(R.id.digit3, Type.TYPE_DIGIT);
+        sButtonType.put(R.id.digit4, Type.TYPE_DIGIT); sButtonType.put(R.id.digit5, Type.TYPE_DIGIT);
+        sButtonType.put(R.id.digit6, Type.TYPE_DIGIT); sButtonType.put(R.id.digit7, Type.TYPE_DIGIT);
+        sButtonType.put(R.id.digit8, Type.TYPE_DIGIT); sButtonType.put(R.id.digit9, Type.TYPE_DIGIT);
+        sButtonType.put(R.id.back, Type.TYPE_BACK); sButtonType.put(R.id.plus, Type.TYPE_PLUS);
+        sButtonType.put(R.id.point, Type.TYPE_POINT); sButtonType.put(R.id.qq_wallet, Type.TYPE_PAY);
+        sButtonType.put(R.id.weichat_wallet, Type.TYPE_PAY); sButtonType.put(R.id.equal, Type.TYPE_EQUAL);
     }
 
     private Button digit0;
@@ -74,8 +69,12 @@ public class InputFragment extends BaseFragment implements View.OnClickListener{
     private Button equal;
     private Button qqWallet;
     private Button wechatWallet;
-    private CalculatorDisplay mDisplay;
+
     private Typeface mTypeface;
+    private CalculatorDisplay mDisplay;
+    private static final BigDecimal MAX_MONEY_VALUE = new BigDecimal(100000);
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -85,6 +84,7 @@ public class InputFragment extends BaseFragment implements View.OnClickListener{
         mTypeface = Typeface.createFromAsset(assets, font);
         mDisplay = (CalculatorDisplay) view.findViewById(R.id.display);
         mDisplay.setTypeface(mTypeface);
+        mDisplay.setSecondDisplay((TextView) view.findViewById(R.id.second_display));
         initInputPad(view);
         return view;
     }
@@ -123,174 +123,97 @@ public class InputFragment extends BaseFragment implements View.OnClickListener{
         equal.setOnClickListener(this); equal.setTypeface(mTypeface);
         qqWallet.setOnClickListener(this);
         wechatWallet.setOnClickListener(this);
+
         back.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if(mDisplay.getContentLength() > 0) {
-                    mDisplay.clearContent();
-                    mStates.clear();
-                    mState = STATE_START;
-                    return true;
+                if(inputEngine.getContentLength() > 0) {
+                    inputEngine.reset();
+                    mDisplay.clearAll();
                 }
                 return false;
             }
         });
     }
 
-    private static final int STATE_START = 0;
-    private static final int STATE_LEAD_POINT = 1;
-    private static final int STATE_LEAD_ZERO = 3;
-    private static final int STATE_INTEGER = 4;
-    private static final int STATE_DECIMAL = 5;
-    private static final int STATE_PLUS = 6;
-    private int mState = STATE_START;
-    private Stack<Integer> mStates = new Stack<>();
-    private boolean mEqualPressed = false;
+
+    InputEngine inputEngine = new InputEngine();
+    boolean equalPressed = false;
+
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        int type = sButtonType.get(id);
-        if(type == TYPE_PAY) {
-            String result = mDisplay.getContent();
-            if((mState == STATE_DECIMAL || mState == STATE_INTEGER) && !result.contains("+")) {
-                float money = parseResult(mDisplay.getContent());
-                Intent data = new Intent();
-                data.putExtra(Cons.ARG_MONEY, money);
-                int action = id == R.id.weichat_wallet ? Cons.ACTION_WECHAT_PAY : Cons.ACTION_QQ_PAY;
-                mListener.onEvent(this, action, data);
-            }
-            else {
-                Toast.makeText(getContext(), "invalid money", Toast.LENGTH_SHORT).show();
-            }
-        } else if(type == TYPE_BACK) {
-            if(mEqualPressed) {
-                clearState();
-            }
-            else if(mState != STATE_START) {
-                mDisplay.removeTail();
-                if(mStates.empty()) {
-                    throw new RuntimeException("State error");
-                }
-                mState = mStates.peek();
-                mStates.pop();
-            }
-        } else if(type == TYPE_EQUAL) {
-            if(mState != STATE_START) {
-                mEqualPressed = true;
-//                Log.d(TAG, "expr = " + mDisplay.getContent());
-                float result = parseResult(mDisplay.getContent());
-                mDisplay.setContent(String.format("%.2f", result));
-//                Log.d(TAG, "result = " + parseResult(mDisplay.getContent()));
-                mState = STATE_DECIMAL;
-                // restore states, since result is always formatted like 'xxx.xx', so restore is easy
-                mStates.clear();
-                mStates.push(STATE_START);
-                if(result < 1) {
-                    // if result < 1, means display content like 0.xx
-                    mStates.push(STATE_LEAD_ZERO);
-                }
-                else {
-                    int l = mDisplay.getContentLength() - 3;
-                    for (int i = 0; i < l; i++) mStates.push(STATE_INTEGER);
-                }
-                // last three char '.xx',
-                // so 2 decimal states should be pushed into stack
-                // because the last char is represented by mState
-                mStates.push(STATE_DECIMAL);
-                mStates.push(STATE_DECIMAL);
-            }
+        Type type = sButtonType.get(id);
+        if(type == Type.TYPE_PAY) {
+            onPayPressed(id == R.id.weichat_wallet ? Cons.ACTION_WECHAT_PAY : Cons.ACTION_QQ_PAY);
         } else {
-            if(mEqualPressed) {
-                // if press '+' we continue calculator, else we clear screen
-                if(mEqualPressed) {
-                    if(type == TYPE_PLUS) {
-                        mEqualPressed = false;
+            switch (type) {
+                case TYPE_BACK:
+                    if (equalPressed) {
+                        inputEngine.reset();
+                        equalPressed = false;
+                    } else {
+                        inputEngine.removeTail();
                     }
-                    else {
-                        clearState();
-                    }
-                }
-            }
-            switch (mState) {
-                case STATE_START:
-                    if (type == TYPE_POINT || type == TYPE_ZERO || type == TYPE_DIGIT) {
-                        mDisplay.appendTail(sButtonContent.get(id));
-                        if (type == TYPE_POINT) mState = STATE_LEAD_POINT;
-                        else if (type == TYPE_ZERO) mState = STATE_LEAD_ZERO;
-                        else if (type == TYPE_DIGIT) mState = STATE_INTEGER;
-                        mStates.push(STATE_START);
+                    mDisplay.setContent(inputEngine.getContent());
+                    break;
+                case TYPE_EQUAL:
+                    if (inputEngine.getContentLength() > 0) {
+                        onEqualPressed();
                     }
                     break;
-                case STATE_LEAD_POINT:
-                    if (type == TYPE_ZERO || type == TYPE_DIGIT) {
-                        mDisplay.appendTail(sButtonContent.get(id));
-                        mState = STATE_DECIMAL;
-                        mStates.push(STATE_LEAD_POINT);
-                    }
-                    break;
-                case STATE_LEAD_ZERO:
-                    if (type == TYPE_DIGIT || type == TYPE_POINT) {
-                        if (type == TYPE_POINT) {
-                            mDisplay.appendTail(sButtonContent.get(id));
-                            mState = STATE_DECIMAL;
-                            mStates.push(STATE_LEAD_ZERO);
+                case TYPE_DIGIT:case TYPE_PLUS:
+                case TYPE_POINT:case TYPE_ZERO:
+                    if (equalPressed) {
+                        equalPressed = false;
+                        if (type != Type.TYPE_PLUS) {
+                            mDisplay.clearAll();
+                            inputEngine.reset();
                         } else {
-                            mDisplay.replaceTail(sButtonContent.get(id));
-                            mState = STATE_INTEGER;
+                            if(mDisplay.maxTextReached()) {
+                                equalPressed = true;
+                            }
                         }
                     }
-                    break;
-                case STATE_INTEGER:
-                    mDisplay.appendTail(sButtonContent.get(id));
-                    if (type == TYPE_DIGIT) mState = STATE_INTEGER;
-                    else if (type == TYPE_PLUS) mState = STATE_PLUS;
-                    else if (type == TYPE_POINT) mState = STATE_DECIMAL;
-                    else if (type == TYPE_ZERO) mState = STATE_INTEGER;
-                    mStates.push(STATE_INTEGER);
-                    break;
-                case STATE_DECIMAL:
-                    if (type == TYPE_DIGIT || type == TYPE_ZERO || type == TYPE_PLUS) {
-                        mDisplay.appendTail(sButtonContent.get(id));
-                        if(type == TYPE_DIGIT) mState = STATE_DECIMAL;
-                        else if(type == TYPE_ZERO) mState = STATE_DECIMAL;
-                        else mState = STATE_PLUS;
-                        mStates.push(STATE_DECIMAL);
-                    }
-                    break;
-                case STATE_PLUS:
-                    if(type == TYPE_DIGIT || type == TYPE_ZERO || type == TYPE_POINT) {
-                        mDisplay.appendTail(sButtonContent.get(id));
-                        if(type == TYPE_DIGIT) mState = STATE_INTEGER;
-                        else if(type == TYPE_ZERO) mState = STATE_LEAD_ZERO;
-                        else if(type == TYPE_POINT) mState = STATE_LEAD_POINT;
-                        mStates.push(STATE_PLUS);
+                    String buttonContent = sButtonContent.get(id);
+                    if(!mDisplay.maxTextReached() && inputEngine.append(buttonContent)) {
+                        mDisplay.setContent(inputEngine.getContent());
                     }
                     break;
             }
         }
     }
 
-    private void clearState() {
-        mDisplay.setContent("");
-        mState = STATE_START;
-        mStates.clear();
-        mEqualPressed = false;
+    private void onEqualPressed() {
+        if(!inputEngine.isContentNumber()) {
+            equalPressed = true;
+            inputEngine.collapseToResult();
+            mDisplay.setResultWithAnim(inputEngine.getContent());
+        }
     }
 
-    private float parseResult(String expr) {
-        return parseResult(expr, 0);
+    private void onPayPressed(int payType) {
+        if(inputEngine.isContentNumber()) {
+            BigDecimal money = inputEngine.parseResult();
+            if(money.compareTo(MAX_MONEY_VALUE) < 0) {
+                Intent data = new Intent();
+                data.putExtra(Cons.ARG_MONEY, money.floatValue());
+                mListener.onEvent(this, payType, data);
+            } else {
+                T("金额过大, 请检查输入是否有误");
+            }
+        }
+        else {
+            T("输入金额不合法，请检查输入是否有误");
+        }
     }
-
-    private float parseResult(String expr, int start) {
-        if(start >= expr.length()) return 0;
-        int e = start;
-        while(e < expr.length() && expr.charAt(e) != '+') e++;
-        return Float.valueOf(expr.substring(start, e)) + parseResult(expr, e+1);
-    }
-
 
     @Override
     public void updateUserInfo(LoginResponse.ShopUser user) {
 
+    }
+
+    private void T(String msg) {
+        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
     }
 }

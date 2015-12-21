@@ -103,12 +103,20 @@ public class DateUtils {
         return ca.getTime();
     }
 
+    /**
+     * monday as the first day
+     * sunday as the last day
+     * @return
+     */
     public static Date getFirstDayOfWeek() {
         Calendar ca = Calendar.getInstance();
         ca.setTime(new Date());
-        ca.set(Calendar.DAY_OF_WEEK, 1);
-        if (ca.getFirstDayOfWeek() == Calendar.SUNDAY) {
-            ca.add(Calendar.DAY_OF_MONTH, +1);
+        int w = ca.get(Calendar.DAY_OF_WEEK);
+        if(w == 1) {
+            // sunday now
+            ca.add(Calendar.DATE, -6);
+        } else {
+            ca.add(Calendar.DATE, w-2);
         }
         return ca.getTime();
     }
@@ -116,11 +124,14 @@ public class DateUtils {
     public static Date getLastDayOfWeek() {
         Calendar ca = Calendar.getInstance();
         ca.setTime(new Date());
-        ca.set(Calendar.DAY_OF_WEEK, ca.getActualMaximum(Calendar.DAY_OF_WEEK));
-        if (ca.getFirstDayOfWeek() == Calendar.SUNDAY) {
-            ca.add(Calendar.DAY_OF_MONTH, +1);
+        int w = ca.get(Calendar.DAY_OF_WEEK);
+        if(w == 1) {
+            // sunday
+            return ca.getTime();
+        } else {
+            ca.add(Calendar.DATE, 8-w);
+            return ca.getTime();
         }
-        return ca.getTime();
     }
 
     public static String formatStandard(Date date) {

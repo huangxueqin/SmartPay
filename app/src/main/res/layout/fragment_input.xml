@@ -3,14 +3,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <com.android.smartpay.CalculatorDisplay
-        android:id="@+id/display"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:textColor="#888888"
-        android:background="@drawable/calculator_display"
-        android:paddingBottom="10dp" />
+        android:background="@color/colorWhite">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_weight="2"
+            android:fillViewport="true"
+            android:layout_height="0dp">
+            <TextView
+                android:id="@+id/second_display"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/calculator_display"
+                android:textColor="@color/colorGray"
+                android:inputType="none"
+                android:focusable="false"
+                android:padding="5dp"/>
+        </ScrollView>
+
+        <com.android.smartpay.fragments.CalculatorDisplay
+            android:layout_weight="1"
+            android:id="@+id/display"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:textColor="#888888"
+            android:background="@drawable/calculator_display"
+            android:padding="5dp" />
+    </LinearLayout>
+
 
     <include
         layout="@layout/input_pad"

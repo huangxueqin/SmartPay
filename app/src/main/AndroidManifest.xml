@@ -18,15 +18,17 @@
         android:supportsRtl="true"
         android:theme="@style/MyAppTheme">
         <activity android:name=".MainActivity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask">
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".LoginActivity"
+            android:screenOrientation="portrait" />
+
         <activity android:name=".OrderSpecificActivity" android:screenOrientation="portrait"/>
         <activity android:name=".TransactionResultActivity" android:screenOrientation="portrait"/>
         <activity android:name=".CaptureActivity" android:screenOrientation="portrait"/>

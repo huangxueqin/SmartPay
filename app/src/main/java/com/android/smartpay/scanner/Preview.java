@@ -71,7 +71,6 @@ public class Preview extends ViewGroup {
 
             if(mCamera != null) {
                 mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
-//                Log.d(TAG, "mSupportPreviewSizes = " + mSupportedPreviewSizes.size());
             }
         }
     }
@@ -135,7 +134,6 @@ public class Preview extends ViewGroup {
                         orientation == Configuration.ORIENTATION_LANDSCAPE ? mPreviewSize.width : mPreviewSize.height;
                 previewHeight =
                         orientation == Configuration.ORIENTATION_LANDSCAPE ? mPreviewSize.height : mPreviewSize.width;
-                ;
             }
             int childWidth = width;
             int childHeight = height;

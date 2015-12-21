@@ -113,11 +113,15 @@ public class LocalPayService extends Service {
                 OrderPayResponse payResponse = mHttpService.executeJsonPostSync(HttpUtils.ORDER_PAY_URL,
                         new Gson().toJson(payParam), OrderPayResponse.class);
                 if(mCancelPay) {
-                    sendMessage(Message.obtain(null, Cons.MSG_CANCEL_ORDER_PAY));
+                    Message msg = Message.obtain(null, Cons.MSG_CANCEL_ORDER_PAY);
+                    msg.obj = submitResponse.data.order;
+                    sendMessage(msg);
                     return;
                 }
                 if(payResponse == null) {
-                    sendMessage(Message.obtain(null, Cons.MSG_ORDER_PAY_FAILED));
+                    Message msg = Message.obtain(null, Cons.MSG_ORDER_PAY_FAILED);
+                    msg.obj = submitResponse.data.order;
+                    sendMessage(msg);
                     return;
                 }
 
@@ -152,7 +156,9 @@ public class LocalPayService extends Service {
                         }
                     }
                 }
-                sendMessage(Message.obtain(null, Cons.MSG_CANCEL_ORDER_PAY));
+                Message msg = Message.obtain(null, Cons.MSG_CANCEL_ORDER_PAY);
+                msg.obj = submitResponse.data.order;
+                sendMessage(msg);
                 mIsPaying = false;
             }
         };

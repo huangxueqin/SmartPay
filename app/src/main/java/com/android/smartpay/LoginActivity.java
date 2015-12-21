@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -137,7 +138,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             mLoginDialog.setMessage("正在登录，请稍候...");
             mLoginDialog.setIndeterminate(false);
             mLoginDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//            mLoginDialog.setCancelable(false);
+            mLoginDialog.setCancelable(false);
         }
     }
 
@@ -146,12 +147,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if(!mCbAccountRemember.isChecked()) {
             mPreferences.clearAccountInfo();
         }
+        L("on pause running");
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
         unregisterReceiver(mNetworkReceiver);
+        L("on destory running");
         super.onDestroy();
     }
 
@@ -182,6 +185,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
                 break;
         }
+    }
+
+    private static void L(String msg) {
+        Log.d("login activity--->", msg);
     }
 
 }
