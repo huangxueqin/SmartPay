@@ -116,7 +116,7 @@ public class DateUtils {
             // sunday now
             ca.add(Calendar.DATE, -6);
         } else {
-            ca.add(Calendar.DATE, w-2);
+            ca.add(Calendar.DATE, 2-w);
         }
         return ca.getTime();
     }

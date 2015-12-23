@@ -377,6 +377,7 @@ public class DataLoader {
                     }
 
                     Date week = DateUtils.getFirstDayOfWeek();
+                    L(mMapFormatter.format(week));
                     int weekIndex = mMap.get(mMapFormatter.format(week));
                     for (int i = weekIndex; i < PAST_DAY_NUM; i++) {
                         mWeekOrders.addAll(mDayOrder.get(i));

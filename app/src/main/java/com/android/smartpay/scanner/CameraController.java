@@ -144,7 +144,6 @@ public class CameraController {
             }
             setCameraParams();
             startPreviewSafe();
-
         }
 
         @Override

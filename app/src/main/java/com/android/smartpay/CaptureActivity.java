@@ -213,6 +213,7 @@ public class CaptureActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        L("on resume running");
         super.onResume();
         if(mCameraOpenSuccess) {
             mCameraController.startPreviewSafe();
@@ -221,6 +222,7 @@ public class CaptureActivity extends AppCompatActivity {
 
     @Override
 	protected void onPause() {
+        L("on pause running");
         if(mCameraOpenSuccess) {
             mCameraController.stopPreview();
         }
@@ -229,6 +231,7 @@ public class CaptureActivity extends AppCompatActivity {
 
 	@Override
 	protected void onDestroy() {
+        L("on destroy running");
         unregisterReceiver(mScanReceiver);
 		mCameraController.closeCamera();
 		super.onDestroy();

@@ -1,6 +1,8 @@
 package com.android.smartpay.fragments;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -41,6 +43,7 @@ public class InputEngine {
     public void removeTail() {
         if(mContent.length() > 0) {
             mContent.setLength(mContent.length() - 1);
+            onStatePoped(mCurState);
             mCurState = mStates.peek();
             mStates.pop();
         }
@@ -54,6 +57,15 @@ public class InputEngine {
 
     public String getContent() {
         return mContent.toString();
+    }
+
+    public String printStates() {
+        List<State> states = new ArrayList<>(mStates);
+        String result = "";
+        for(State state : states) {
+            result += state.toString();
+        }
+        return result;
     }
 
     public int getContentLength() {
@@ -82,6 +94,14 @@ public class InputEngine {
         BigDecimal result = parseResult(mContent.toString());
         buildStatesFromResult(result);
         return result;
+    }
+
+    private void onStatePoped(State state) {
+        switch (state) {
+            case STATE_DECIMAL:
+                mDecimalDigitNum--;
+                break;
+        }
     }
 
     private void buildStatesFromResult(BigDecimal result) {

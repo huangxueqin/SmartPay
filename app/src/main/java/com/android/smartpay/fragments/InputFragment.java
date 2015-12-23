@@ -6,6 +6,7 @@ import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -176,6 +177,12 @@ public class InputFragment extends BaseFragment implements View.OnClickListener{
                         }
                     }
                     String buttonContent = sButtonContent.get(id);
+                    L(buttonContent);
+                    if(mDisplay.maxTextReached()) {
+                        L("max Text Reached");
+                    }
+                    L(inputEngine.getContent());
+                    L(inputEngine.printStates());
                     if(!mDisplay.maxTextReached() && inputEngine.append(buttonContent)) {
                         mDisplay.setContent(inputEngine.getContent());
                     }
@@ -215,5 +222,8 @@ public class InputFragment extends BaseFragment implements View.OnClickListener{
 
     private void T(String msg) {
         Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+    }
+    private static void L(String msg) {
+        Log.d(TAG, msg);
     }
 }
